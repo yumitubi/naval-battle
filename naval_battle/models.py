@@ -36,6 +36,16 @@ class Games(db.Document):
         
 class Users(db.Document):
     """model contain info about users
+
+    - field `session`: uniq session 
+    - field `user`: name user from form
+    - field `game`: id game
+    - field `field`: id fields
+    - field `status`: status of user
+                '0' - user wait oponent
+                '1' - user build power on field
+                '2' - user in games
+                '3' - user final game
     """
     user_name = db.StringField(max_length=255, required=True)
     session = db.StringField(max_length=255, required=True)

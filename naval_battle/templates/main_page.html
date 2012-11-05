@@ -4,16 +4,13 @@
 <div class="span12">
  <div class="row">
     <div class="span4">
-      {% for i in test %}
+      {% for i in headers %}
       {{ i }}
       {% endfor %}
-      {% for i in test2 %}
-      {{ i }}
-      {% endfor %}
-      <form class="form-search">
+      <form class="form-seach">
         <div class="input-append">
-            <input type="text" class="span2">
-            <button type="submit" class="btn">Играть!</button>
+            <input type="text" class="span2" name="username">
+            <button type="button" class="btn">Создать сервер!</button>
         </div>
       </form>
     </div>
