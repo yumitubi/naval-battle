@@ -1,0 +1,46 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+  <head>
+    <title>Морской бой v.0.0.1</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <link href="/static/bootstrap.css" rel="stylesheet">
+    <meta name="keywords" content="naval battle, sea_battle, морской бой, le087, игра, игра по сети" />
+  </head>
+  <body>
+    <div class="container">
+      <div class="span12">
+	<div class="span9">
+	  <h2>Морскй бой</h2>
+	</div>
+	<div class="span2">
+	  <div class="sidebar-nav" style="align: right;">
+	    <div class="well" style="width:180px; padding: 8px 0;">
+	      <ul class="nav nav-list"> 
+		<li><a href="/">Главная страница</a></li>
+		<li><a href="/">Расстановка сил</a></li>
+		<li><a href="/">Ход игры</a></li>
+		<li><a href="/">Игра</a></li>
+		<li><a href="/">Архив</a></li>
+	      </ul>
+	    </div>
+	  </div>
+	</div>
+      </div>
+      <div class="row">
+	<div class="span12">
+	  <div class="well">
+	    {{ current_page }}
+	  </div>
+	</div>
+      </div>
+      <div class="span12">
+	{% block content %}{% endblock %}
+      </div>
+    </div>
+    <div class="container">
+      <hr /><br />
+      <div class="span12"></div>
+	<p class="pull-right muted"><a href="http://le087.ru/">© le087's blog 2011-2012</a></p>
+    </div>
+  </body>
+</html>
