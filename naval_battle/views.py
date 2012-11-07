@@ -5,7 +5,8 @@
 
 from flask import render_template, request, session, make_response
 from naval_battle import app
-from naval_battle.utils import get_fields, add_user_in_db, randstring
+from naval_battle.utils2 import randstring
+from naval_battle.utils import get_fields, add_user_in_db
 
 @app.route("/", methods=['GET', 'POST'])
 def main_page():
@@ -26,12 +27,24 @@ def add_new_user():
     if request.method == 'POST':
         session['username'] = request.form['username']
         cookie_session = randstring()
-        add_user_in_db()
+        game = None
+        field = None
+        add_user_in_db(session['username'], cookie_session, game, field)
         registration = render_template('', user_wait=True)
         response = make_response(registration)
         response.set_cookie('session_id', cookie_session)
         return response
     else:
+        return render_template('main_page.html', 
+                               user_wait=False)
+
+@app.route("/add_second_user", methods=['GET', 'POST'])
+def add_second_user():
+    """registration second user for play
+    """
+    if request.method == 'POST': 
+        pass
+    else: 
         return render_template('main_page.html', 
                                user_wait=False)
 

@@ -2,37 +2,35 @@
 
 import datetime 
 from naval_battle import db
-
-def gen_dict():
-    """generate empty dict for class fields
-    """
-    horizontal_coord = ('a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j')
-    battle_field = {}
-    for i in range(10):
-        horizont = {}
-        for p in horizontal_coord:
-            horizont[p] = 0
-        battle_field[str(i+1)] = horizont
-    return battle_field
+from naval_battle.utils2 import gen_dict
 
 class Fields(db.Document):
     """model contain snapshot fields
+
+    - field `snapshot`: contain dict for record current status in 
+                        coordinate field
+                  `0` - empty, not shot
+                  `1` - empty, shot
+                  `2` - ship. not shot
+                  `3` - ship, shot
     """
     snapshot = db.DictField(default=gen_dict(), required=True)
     
-    def __unicode__(self):
-        return self.snapshot
-    
 class Games(db.Document):
     """model contain info about games
+    
+    - field `fields`: list fields
+    - field `time_begin`: the begin time game
+    - field `time_end`: the begin time end game
+    - field `status`: default 0, in reserv
     """
     fields = db.ListField(db.ReferenceField(Fields, dbref=True))
     time_begin = db.DateTimeField(default=datetime.datetime.now, required=True)
     time_end = db.DateTimeField(default=datetime.datetime.now, required=True)
-    status = db.IntField()
+    status = db.IntField(default=0)
 
     def __unicode__(self):
-        return self.status
+        return str(self.status)
         
 class Users(db.Document):
     """model contain info about users
@@ -42,10 +40,12 @@ class Users(db.Document):
     - field `game`: id game
     - field `field`: id fields
     - field `status`: status of user
-                '0' - user wait oponent
-                '1' - user build power on field
-                '2' - user in games
-                '3' - user final game
+                `0` - user wait oponent
+                `1` - user build power on field
+                `2` - user in games
+                `4` - user go
+                `5` - user wait move 
+                `6` - user final game
     """
     user_name = db.StringField(max_length=255, required=True)
     session = db.StringField(max_length=255, required=True)
@@ -55,6 +55,19 @@ class Users(db.Document):
 
     def __unicode__(self):
         return self.user_name
+
+class Ships(db.Document):
+    """model contain objects ship
+    and description his propertios
+    
+    - field `ship`: properties ship
+    - field `field`: foreign key to field
+    """
+    ship = db.DictField(default={}, required=True)
+    field = db.ReferenceField(Fields, dbref=True)
+
+    def __unicode__(self):
+        return self.ship
         
 class Logs(db.Document):
     """model contain info about all move of players

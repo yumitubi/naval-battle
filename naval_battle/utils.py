@@ -1,15 +1,19 @@
 # -*- coding: utf-8 -*-
 
-from random import choice
-from string import letters, digits
-from models import Fields, Users
+from models import Fields, Users, Games
 
+#------------------------------------------------------------
+# get database section
+#------------------------------------------------------------
 def get_fields():
-    """return fields
+    """return fields from database
     """
     return Fields.objects()
 
-def add_user_in_db(session, user, game, field, status):
+#------------------------------------------------------------
+# add database section
+#------------------------------------------------------------
+def add_user_in_db(session, user, game, field, status=0):
     """create user in database for registration in game
     
     Arguments:
@@ -26,10 +30,19 @@ def add_user_in_db(session, user, game, field, status):
                      status=status)
     new_user.save()
 
-def randstring(length=32):
-    """ return string with random symbols
-    
-    author:         Dan Crosta
-    repositories:   https://github.com/dcrosta/plog/blob/master/plog/utils.py#L43
+def add_new_field():
+    """add new field in database
     """
-    return ''.join(choice(letters + digits) for x in xrange(length))    
+    new_field = Fields()
+    new_field.save()
+    return new_field
+
+def add_new_game(new_field):
+    """add new game in database
+    
+    - `new_field`: object field
+    """
+    new_game = Games(fields=[new_field])
+    new_game.save()
+    return new_game
+
