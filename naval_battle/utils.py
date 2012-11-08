@@ -10,6 +10,14 @@ def get_fields():
     """
     return Fields.objects()
 
+def check_cookie(cookie):
+    """check cookie-session in database
+    
+    Arguments:
+    - `cookie`: dictionary with cookie {'session_id':'5OD0Xlt6EYhsW4vzXIe3HF8kvABHRNTg'}
+    """
+    pass
+
 #------------------------------------------------------------
 # add database section
 #------------------------------------------------------------
@@ -29,6 +37,7 @@ def add_user_in_db(session, user, game, field, status=0):
                      field_battle=field,
                      status=status)
     new_user.save()
+    return new_user
 
 def add_new_field():
     """add new field in database

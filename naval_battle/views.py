@@ -3,37 +3,45 @@
 # views
 #------------------------------------------------------------
 
-from flask import render_template, request, session, make_response
+from flask import render_template, request, make_response, jsonify
 from naval_battle import app
 from naval_battle.utils2 import randstring
-from naval_battle.utils import get_fields, add_user_in_db
+from naval_battle.utils import add_user_in_db, add_new_game \
+,add_new_field
 
 @app.route("/", methods=['GET', 'POST'])
 def main_page():
-    """main page
+    """main page, install cookie for new users
     """
-    list_fields = get_fields()
     current_page = u'Главная страница'
-    headers = request.cookies['sessionid']
-    return render_template('main_page.html', 
-                           list_fields=list_fields,
-                           current_page=current_page,
-                           headers=headers)
+    if not request.cookies.has_key('session_id'):
+        cookie_session = randstring()
+        response = make_response(render_template('main_page.html', current_page=current_page))
+        response.set_cookie('session_id', cookie_session)
+        return response
+    else:
+        return make_response(render_template('main_page.html', current_page=current_page))
+        
 
 @app.route("/add_new_user/", methods=['GET', 'POST'])
 def add_new_user():
     """registration user in database
     """
     if request.method == 'POST':
-        session['username'] = request.form['username']
-        cookie_session = randstring()
-        game = None
-        field = None
-        add_user_in_db(session['username'], cookie_session, game, field)
-        registration = render_template('', user_wait=True)
-        response = make_response(registration)
-        response.set_cookie('session_id', cookie_session)
-        return response
+        username = request.form.keys()[0]
+        if request.cookies.has_key('session_id'):
+            cookie_session = request.cookies.get('session_id')
+        else:
+            cookie_session = randstring()
+        field = add_new_field()
+        game = add_new_game(field)
+        if add_user_in_db(cookie_session, username, game, field):
+            return jsonify(username=username,
+                               new_user=True)
+        else:
+            # TODO 
+            # return empty dictionary with code None
+            return jsonify()
     else:
         return render_template('main_page.html', 
                                user_wait=False)

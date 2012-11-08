@@ -4,15 +4,15 @@
 <div class="span12">
  <div class="row">
     <div class="span4">
-      {% for i in headers %}
-      {{ i }}
-      {% endfor %}
-      <form class="form-seach">
-        <div class="input-append">
+      <div id="add_new_user">
+	<script type="text/javascript" src="/static/naval_battle.js"></script>
+	<form class="form-seach">
+          <div class="input-append">
             <input type="text" class="span2" name="username">
-            <button type="button" class="btn">Создать сервер!</button>
-        </div>
-      </form>
+            <button type="button" class="btn" onclick="AddNewUser(); return false">Создать сервер!</button>
+          </div>
+	</form>
+      </div>
     </div>
 </div>
 </div>
