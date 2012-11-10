@@ -22,7 +22,10 @@ class Games(db.Document):
     - field `fields`: list fields
     - field `time_begin`: the begin time game
     - field `time_end`: the begin time end game
-    - field `status`: default 0, in reserv
+    - field `status`: status of game, default 0
+                `0` - game wait
+                `1` - game begin
+                `2` - game end
     """
     fields = db.ListField(db.ReferenceField(Fields, dbref=True))
     time_begin = db.DateTimeField(default=datetime.datetime.now, required=True)
@@ -54,7 +57,7 @@ class Users(db.Document):
     status = db.IntField()
 
     def __unicode__(self):
-        return self.user_name
+        return str(self.user_name)
 
 class Ships(db.Document):
     """model contain objects ship
@@ -67,7 +70,7 @@ class Ships(db.Document):
     field = db.ReferenceField(Fields, dbref=True)
 
     def __unicode__(self):
-        return self.ship
+        return str(self.ship)
         
 class Logs(db.Document):
     """model contain info about all move of players
@@ -78,6 +81,6 @@ class Logs(db.Document):
     time = db.DateTimeField(default=datetime.datetime.now, required=True)
 
     def __unicode__(self):
-        return self.move_user
+        return str(self.move_user)
         
 

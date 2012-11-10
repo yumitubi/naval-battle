@@ -7,7 +7,7 @@ from flask import render_template, request, make_response, jsonify
 from naval_battle import app
 from naval_battle.utils2 import randstring
 from naval_battle.utils import add_user_in_db, add_new_game, get_wait_users \
-,add_new_field, get_user_id
+,add_new_field, get_user_id, get_begin_games
 
 @app.route("/", methods=['GET', 'POST'])
 def main_page():
@@ -39,7 +39,7 @@ def add_new_user():
                    `0` - this old user, dont hand
     """
     if request.method == 'POST':
-        username = request.form.values()[0]
+        username = request.form.values()[0].encode('utf8')
         if request.cookies.has_key('session_id'):
             cookie_session = request.cookies.get('session_id')
         else:
@@ -66,13 +66,25 @@ def add_second_user():
 @app.route("/update_data_for_main_page/", methods=['GET', 'POST'])
 def update_data_main_page():
     """return json with information about:
+
     - users who wait second player
     - games which does now
+
+    the structure of dictionary is:
+    { 'users':{ 'id1':'username1',
+                'id2':'username2'},
+
+      'games': { 'id':[user1, user2],
+                 'id':[user1, user2]}}
     """
     if request.method == 'POST':
-        users = get_wait_users();
-        
-        return jsonify()
+        data = { 'users':{}, 'games':[] }
+        users = get_wait_users()
+        for user in users:
+            data['users'][user.id] = user.user_name
+        games = get_begin_games()
+        data['games'] = games
+        return jsonify(data)
 
 @app.route("/move_games/")
 def move_game():

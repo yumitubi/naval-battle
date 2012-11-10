@@ -13,7 +13,24 @@ def get_fields():
 def get_wait_users():
     """return list of users who are waiting game
     """
-    return Users.objects(status=0)
+    users = Users.objects(status=0)
+    print users
+    return users
+
+def get_begin_games():
+    """return list begin games
+    """
+    games_begin = Games.objects(status=1)
+    users = Users.objects(game__in=games_begin)
+    games = {}
+    for user in users:
+        id_game = str(user.game)
+        if games.haskey(id_game):
+            games[id_game].append(user.user_name)
+        else:
+            games[id_game] = [user.user_name]
+    return games
+
 
 def get_user_id(session_id):
     """return user with id

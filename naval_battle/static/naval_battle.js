@@ -26,31 +26,41 @@ function LoadMainPage(){
 	type: 'post',
 	dataType: 'json',
 	data: ({}),
-	success: UpdateMainPage(data)
+	success: UpdateMainPage()
     });
 }
 
 // Update Main Page
 // get info about:
-//     - users who wait second player
-//     - games which does now
+//     - users is who wait second player
+//     - games is which does now
 ////////////////////////////////////////////
 // Argments ////////////////////////////////
 // `data` - json from server
 function UpdateMainPage(data){
-    var i = 0;
-    ++i;
+    alert(JSON.stringify(data))
+    // $('#list_gamers').append('<h3>Ждут игры:</h3>');
+    // $('#list_gamers').append('<table></table>');
+    // $('table').attr('class', 'table');
+    // for (var i=0; i<data.length; i++){
+    // 	$('.table').append('<tr><td>' + data[]+ '</td></tr>');
+    // }
 }
 
-function TestRepeat(){
-    window.m = 0;
-    var intid = setInterval(function (){
-	$('#test3').append(m+' ');
-	++m;
-	if (m > 9){
-	    clearInterval(intid);
-	}
-    }, 1000);
-}
+// draw information about gamers and games
+$(document).ready(LoadMainPage)
 
-$(document).ready(TestRepeat)
+////////////////////////////////////////////////
+// function TestRepeat(){                     // 
+//     window.m = 0;                          //
+//     var intid = setInterval(function (){   //
+// 	$('#test3').append(m+' ');            // 
+// 	++m;                                  //
+// 	if (m > 9){                           //
+// 	    clearInterval(intid);             //
+// 	}                                     //
+//     }, 1000);                              //
+// }                                          //
+//                                            //
+// $(document).ready(TestRepeat)              //
+////////////////////////////////////////////////

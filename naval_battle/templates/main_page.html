@@ -12,17 +12,23 @@
             <button type="button" class="btn" onclick="AddNewUser(); return false">Создать сервер!</button>
           </div>
 	</form>
-	<div class="span4">
-	  <h3>Ждут игры:</h3>
-	  <table class="table">
-	    {% for user in users_wait %}
-	    <tr id="users_wait">
-	      <td><div id="{{ user.id }}">{{ user.user_name}}</td>
-	      <td><input class="btn" type="button" name="game" value="Играть!" /></div></td>
-	    </tr>
-	    {% endfor %}
-	  </table>
-	</div>
+  	<div id="list_gamers">
+
+
+	  <!-- <div class="span4"> -->
+	  <!--   <h3>Ждут игры:</h3> -->
+	  <!--   <table class="table"> -->
+	  <!--     {% for user in users_wait %} -->
+	  <!--     <tr id="users_wait"> -->
+	  <!-- 	<td><div id="{{ user.id }}">{{ user.user_name}}</td> -->
+	  <!-- 	<td><input class="btn" type="button" name="game" value="Играть!" /></div></td> -->
+          <!--     </tr> -->
+          <!--     {% endfor %} -->
+          <!--   </table> -->
+          <!-- </div> -->
+
+
+	</div> 
       </div>
     </div>
 </div>
