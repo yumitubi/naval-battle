@@ -6,29 +6,40 @@
 from flask import render_template, request, make_response, jsonify
 from naval_battle import app
 from naval_battle.utils2 import randstring
-from naval_battle.utils import add_user_in_db, add_new_game \
-,add_new_field
+from naval_battle.utils import add_user_in_db, add_new_game, get_wait_users \
+,add_new_field, get_user_id
 
 @app.route("/", methods=['GET', 'POST'])
 def main_page():
     """main page, install cookie for new users
     """
     current_page = u'Главная страница'
+    users_wait = get_wait_users()
     if not request.cookies.has_key('session_id'):
         cookie_session = randstring()
-        response = make_response(render_template('main_page.html', current_page=current_page))
+        response = make_response(render_template('main_page.html', 
+                                                 current_page=current_page,
+                                                 users_wait=users_wait))
         response.set_cookie('session_id', cookie_session)
         return response
     else:
-        return make_response(render_template('main_page.html', current_page=current_page))
+        return make_response(render_template('main_page.html', 
+                                             current_page=current_page,
+                                             users_wait=users_wait))
         
 
 @app.route("/add_new_user/", methods=['GET', 'POST'])
 def add_new_user():
-    """registration user in database
+    """registration user in database for game
+
+    jsonify: 
+     - `username` : username from form 
+     - `user_id` : set user.id for uniq
+     - `new_user`: `1` - this new user
+                   `0` - this old user, dont hand
     """
     if request.method == 'POST':
-        username = request.form.keys()[0]
+        username = request.form.values()[0]
         if request.cookies.has_key('session_id'):
             cookie_session = request.cookies.get('session_id')
         else:
@@ -37,16 +48,12 @@ def add_new_user():
         game = add_new_game(field)
         if add_user_in_db(cookie_session, username, game, field):
             return jsonify(username=username,
-                               new_user=True)
+                           user_id=get_user_id(cookie_session),
+                           new_user=1)
         else:
-            # TODO 
-            # return empty dictionary with code None
-            return jsonify()
-    else:
-        return render_template('main_page.html', 
-                               user_wait=False)
+            return jsonify(new_user=0)
 
-@app.route("/add_second_user", methods=['GET', 'POST'])
+@app.route("/add_second_user/", methods=['GET', 'POST'])
 def add_second_user():
     """registration second user for play
     """
@@ -55,6 +62,17 @@ def add_second_user():
     else: 
         return render_template('main_page.html', 
                                user_wait=False)
+
+@app.route("/update_data_for_main_page/", methods=['GET', 'POST'])
+def update_data_main_page():
+    """return json with information about:
+    - users who wait second player
+    - games which does now
+    """
+    if request.method == 'POST':
+        users = get_wait_users();
+        
+        return jsonify()
 
 @app.route("/move_games/")
 def move_game():

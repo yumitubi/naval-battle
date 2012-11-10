@@ -10,14 +10,19 @@ def get_fields():
     """
     return Fields.objects()
 
-def check_cookie(cookie):
-    """check cookie-session in database
+def get_wait_users():
+    """return list of users who are waiting game
+    """
+    return Users.objects(status=0)
+
+def get_user_id(session_id):
+    """return user with id
     
     Arguments:
-    - `cookie`: dictionary with cookie {'session_id':'5OD0Xlt6EYhsW4vzXIe3HF8kvABHRNTg'}
+    - `session_id`: session_id
     """
-    pass
-
+    user = Users.objects.get(session=session_id)
+    return str(user.id)
 #------------------------------------------------------------
 # add database section
 #------------------------------------------------------------
@@ -31,13 +36,17 @@ def add_user_in_db(session, user, game, field, status=0):
     - `field`: id fields
     - `status`: status of user on site
     """
-    new_user = Users(user_name=user, 
-                     session=session,
-                     game=game,
-                     field_battle=field,
+    # check session_id in database
+    if not Users.objects(session=session):
+        new_user = Users(user_name=user, 
+                         session=session,
+                         game=game,
+                         field_battle=field,
                      status=status)
-    new_user.save()
-    return new_user
+        new_user.save()
+        return True
+    else:
+        return False
 
 def add_new_field():
     """add new field in database
