@@ -78,13 +78,21 @@ def update_data_main_page():
                  'id':[user1, user2]}}
     """
     if request.method == 'POST':
-        data = { 'users':{}, 'games':[] }
         users = get_wait_users()
+        list_username = {}
         for user in users:
-            data['users'][user.id] = user.user_name
+            list_username[str(user.id)] = user.user_name
         games = get_begin_games()
-        data['games'] = games
-        return jsonify(data)
+        return jsonify(users=list_username, games=games)
+
+@app.route("/configure/", methods=['GET', 'POST'])
+def configure():
+    """a page for configere field battle
+    """
+    current_page = u'Настроить расположение фрегатов'
+    response = make_response(render_template('configure.html', current_page=current_page))
+    return response
+
 
 @app.route("/move_games/")
 def move_game():

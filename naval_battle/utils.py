@@ -13,12 +13,15 @@ def get_fields():
 def get_wait_users():
     """return list of users who are waiting game
     """
-    users = Users.objects(status=0)
-    print users
-    return users
+    return Users.objects(status=0)
+
 
 def get_begin_games():
     """return list begin games
+    
+    the structure of dictionary is:
+    { 'id_game':['user1', 'user2'],
+      'id_game':['user1', 'user2']}
     """
     games_begin = Games.objects(status=1)
     users = Users.objects(game__in=games_begin)

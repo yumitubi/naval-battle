@@ -9,8 +9,8 @@ function AddNewUser(){
 	success: function(data)
 	{
 	    if (data['new_user']==1){
-		var str = '<tr id="users_wait"><td><div id="' + data['user_id'] + '">' + data['username']+ '</td><td><input class="btn" type="button" name="game" value="Играть!" /></div></td></tr>'
-		$('#users_wait').parent().append(str);
+		var str = '<tr id="users_wait"><td width="180px">' + data['username']+ '</td><td id="' + data['user_id'] + '"><input class="btn" type="button" name="game" value="Играть!" /></div></td></tr>'
+		$('.table').append(str);
 	    }
 	}
     });
@@ -26,7 +26,7 @@ function LoadMainPage(){
 	type: 'post',
 	dataType: 'json',
 	data: ({}),
-	success: UpdateMainPage()
+	success: UpdateMainPage
     });
 }
 
@@ -38,17 +38,18 @@ function LoadMainPage(){
 // Argments ////////////////////////////////
 // `data` - json from server
 function UpdateMainPage(data){
-    alert(JSON.stringify(data))
-    // $('#list_gamers').append('<h3>Ждут игры:</h3>');
-    // $('#list_gamers').append('<table></table>');
-    // $('table').attr('class', 'table');
-    // for (var i=0; i<data.length; i++){
-    // 	$('.table').append('<tr><td>' + data[]+ '</td></tr>');
-    // }
+    $('#list_gamers').text('')
+    $('#list_gamers').append('<h3>Ждут игры:</h3>');
+    $('#list_gamers').append('<table></table>');
+    $('table').attr('class', 'table');
+    $.each(data['users'], function(key, val){
+	$('.table').append('<tr id="users_wait"><td width="180px">' + val + '</td><td id="' + key + '"><input class="btn" type="button" name="game" value="Играть!"></td></tr>')
+    });
 }
 
 // draw information about gamers and games
 $(document).ready(LoadMainPage)
+$(document).ready(setInterval(LoadMainPage, 5000))
 
 ////////////////////////////////////////////////
 // function TestRepeat(){                     // 
