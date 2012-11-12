@@ -43,6 +43,17 @@ def get_user_id(session_id):
     """
     user = Users.objects.get(session=session_id)
     return str(user.id)
+
+def get_field_dictionary(session_id):
+    """ return the current snapshot field
+    by session_id from cookies
+    
+    Arguments:
+    - `session_id`: session id of user
+    """
+    user = Users.objects.get(session=session_id)
+    return user.field_battle.snapshot
+
 #------------------------------------------------------------
 # add database section
 #------------------------------------------------------------

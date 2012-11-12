@@ -7,7 +7,7 @@ from flask import render_template, request, make_response, jsonify
 from naval_battle import app
 from naval_battle.utils2 import randstring
 from naval_battle.utils import add_user_in_db, add_new_game, get_wait_users \
-,add_new_field, get_user_id, get_begin_games
+,add_new_field, get_user_id, get_begin_games, get_field_dictionary
 
 @app.route("/", methods=['GET', 'POST'])
 def main_page():
@@ -93,7 +93,16 @@ def configure():
     response = make_response(render_template('configure.html', current_page=current_page))
     return response
 
-
+@app.route("/send_state_field/", methods=['GET', 'POST'])
+def send_state_field():
+    """return the current snapshot field
+    """
+    if request.method == 'POST':
+        if request.cookies.has_key('session_id'):
+            cookie_session = request.cookies.get('session_id')
+            field = get_field_dictionary(cookie_session)
+            return jsonify(field=field)
+        
 @app.route("/move_games/")
 def move_game():
     """page for watch game

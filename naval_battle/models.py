@@ -41,7 +41,7 @@ class Users(db.Document):
     - field `session`: uniq session 
     - field `user`: name user from form
     - field `game`: id game
-    - field `field`: id fields
+    - field `field_battle`: id fields
     - field `status`: status of user
                 `0` - user wait oponent
                 `1` - user build power on field

@@ -16,11 +16,8 @@ def randstring(length=32):
 def gen_dict():
     """generate empty dict for class fields
     """
-    horizontal_coord = ('a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j')
     battle_field = {}
-    for i in range(10):
-        horizont = {}
-        for p in horizontal_coord:
-            horizont[p] = 0
-        battle_field[str(i+1)] = horizont
+    for i in range(9):
+        for p in range(9):
+            battle_field[str(i)+str(p)] = '0'
     return battle_field

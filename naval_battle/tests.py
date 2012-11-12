@@ -8,6 +8,7 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 from naval_battle import app
 from naval_battle.utils import add_new_field, add_new_game, get_begin_games, get_wait_users
+from naval_battle.utils2 import gen_dict
 
 class NavalTest:
     """testing naval battle app
@@ -27,13 +28,16 @@ class NavalTest:
     def test_update_main_page(self):
         print get_wait_users()
         print str(get_begin_games())
+        
+    def test_gen_dict(self):
+        print gen_dict()
 
 test = NavalTest()
 
 if __name__ == '__main__':
     # id_field = test.test_add_feild()
     # test.test_add_game(id_field)
-    print 'Проверка get_wait_users()'
-    test.test_update_main_page()
-        
+    # print 'Проверка get_wait_users()'
+    # test.test_update_main_page()
+    test.test_gen_dict()
         
