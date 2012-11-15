@@ -21,14 +21,14 @@ field.drawtable = function (){
     	    $('#'+i).append($(str_td).attr('id', '' + i + m ));
 	    $('#'+i+m).css('border', 'solid 1px');
 	    $('#'+i+m).css('width', '40px');
-	    $('#'+i+m).attr('mark', 'false');
+	    $('#'+i+m).attr('mark', '0');
 
 	    $('#'+i+m).hover(
 		function (){
 		    $(this).css('background-color', 'red');
 		},
 		function (){
-		    if($(this).attr('mark') != 'True'){
+		    if($(this).attr('mark') != '2'){
 			$(this).css('background-color', 'white');
 		    }
 		}
@@ -36,12 +36,16 @@ field.drawtable = function (){
 
 	    $('#'+i+m).click(
 		function (){
-		    if( $(this).attr('mark') == 'false'){
+		    if( $(this).attr('mark') == '0'){
 			$(this).css('background-color', 'red');
-			$(this).attr('mark', 'True');
+			$(this).attr('mark', '2');
+			field.valid();
+			field.push();
 		    } else {
-			$(this).css('background-color', 'red');
-			$(this).attr('mark', 'false');
+			$(this).css('background-color', 'white');
+			$(this).attr('mark', '0');
+			field.valid();
+			field.push();
 		    }
 		}
 	    );
@@ -58,25 +62,64 @@ field.get = function (){
 	dataType: 'json',
 	data: ({}),
         success: function (data){
-	    this['field'] = data['field'];
+	    field.field = data["field"];
 	}
     });
-    return this['field'];
+    return false;
 };
 
 // the method push a data on server
 field.push = function (){
-    
+    for(var i=0; i<10; i++){
+	for(var m=0; m<10; m++){
+	    field.field[''+i+m] = $('#'+i+m).attr('mark');
+	}
+    }
+
+    $.ajax({
+	url: '/get_state_field/',
+	type: 'post',
+	dataType: 'json',
+	data: (JSON.stringify(field.field)),
+        success: function (data){
+	    if(data['result'] == '1'){
+		// alert('Все путем');
+	    } else {
+		alert('Потеряна связь с сервером');
+	    }
+	}
+    });
+    return false;
 };
 
-// other function
+field.valid = function (){
+    for(var i=0; i<10; i++){
+	for(var m=0; m<10; m++){
+	    field.field[''+i+m] = $('#'+i+m).attr('mark');
+	}
+    }
+    
+    // TODO:
+    // - handler 
+    // - send a status
+    return false;
+}
+
+// other functions
 
 function AllRun(){
     field.drawtable();
-    setInterval(alert('test'));
-    // setInterval($('.test_json').text(JSON.stringify(field.get())), 1000);
+    // setInterval(field.get, 3000);
+    // setInterval(field.push, 3000);
+}
+
+function FindShip(field){
+    
 }
 
 $(document).ready(AllRun);
+//$(document).ready(alert(JSON.stringify(field.get())), 3000);
+
+
 
 

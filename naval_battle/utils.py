@@ -51,8 +51,11 @@ def get_field_dictionary(session_id):
     Arguments:
     - `session_id`: session id of user
     """
-    user = Users.objects.get(session=session_id)
-    return user.field_battle.snapshot
+    try:
+        user = Users.objects.get(session=session_id)
+        return user.field_battle.snapshot
+    except:
+        return False
 
 #------------------------------------------------------------
 # add database section
@@ -95,3 +98,25 @@ def add_new_game(new_field):
     new_game.save()
     return new_game
 
+def update_field(session_id, field_dict):
+    """update data in field
+    
+    Arguments:
+    - `session_id`: session current user
+    - `field_dict`: new data in field
+    """
+    try:
+        # if use:
+        # user = Users.objects.get(session=session_id)
+        # user.battle_field.snapshot = field_dict
+        # then flask report about:
+        # "FutureWarning: Cascading saves will default to off in 0.8, please  explicitly set `.save(cascade=True)`"
+        # I rewrote the code ----->
+        user = Users.objects.get(session=session_id)
+        field = Fields.objects.get(id=user.field_battle.id)
+        field.snapshot = field_dict
+        field.save()
+        return True
+    except:
+        print 'проверить utils.update_field'
+        return False
