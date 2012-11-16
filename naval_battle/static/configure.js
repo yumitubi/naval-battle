@@ -2,7 +2,9 @@
 
 var field = {
     line_up: false, // default line up false
-    field: {}       // field battle array 
+    field: {},      // field battle array 
+    cells: {},      // cells
+    ships: {}       // ships
 };
 
 ///////////////////////////////////////////////
@@ -12,6 +14,7 @@ field.drawtable = function (){
     var str_tr = '<tr></tr>';
     var str_td = '<td></td>';
     
+    field.get();
     $('.settings_table').append(str_table);
     
     for(var i=0; i<10; i++){
@@ -22,6 +25,7 @@ field.drawtable = function (){
 	    $('#'+i+m).css('border', 'solid 1px');
 	    $('#'+i+m).css('width', '40px');
 	    $('#'+i+m).attr('mark', '0');
+	    
 
 	    $('#'+i+m).hover(
 		function (){
@@ -33,18 +37,19 @@ field.drawtable = function (){
 		    }
 		}
 	    );
-
 	    $('#'+i+m).click(
 		function (){
 		    if( $(this).attr('mark') == '0'){
-			$(this).css('background-color', 'red');
-			$(this).attr('mark', '2');
-			field.valid();
-			field.push();
+			if(field.addcell($(this).attr('id'))){
+			    $(this).attr('mark', '2');	
+			    $(this).css('background-color', 'red');
+			    field.field[$(this).attr('id')] = '2';
+			    field.push();
+			} 
 		    } else {
 			$(this).css('background-color', 'white');
 			$(this).attr('mark', '0');
-			field.valid();
+			field.field[$(this).attr('id')] = '0';
 			field.push();
 		    }
 		}
@@ -92,29 +97,128 @@ field.push = function (){
     return false;
 };
 
+// run validate of field
 field.valid = function (){
-    for(var i=0; i<10; i++){
-	for(var m=0; m<10; m++){
-	    field.field[''+i+m] = $('#'+i+m).attr('mark');
-	}
-    }
-    
     // TODO:
     // - handler 
     // - send a status
     return false;
 }
 
+// add the cell on a field
+field.addcell = function (coordinata){
+    var x = coordinata[0];
+    var y = coordinata[1];
+    
+    if( field.field[coordinata] && CheckCell(x, y)){
+	// alert('добавлено');
+	return true;
+    } else {
+	return false;
+    }
+}
+
+
 // other functions
+
+// 'x and 'y' - strings
+function CheckCell(x, y){
+
+    // structure:
+    // | 1 | 2 | 3 |
+    // |---+---+---|
+    // | 8 | x | 4 |
+    // |---+---+---|
+    // | 7 | 6 | 5 |
+    // check this structure
+    // x --- > this row
+    // y --- > this column
+
+    var x1y1 = '#' + ((+x)-1) + ((+y)-1);
+    var x3y3 = '#' + ((+x)-1) + ((+y)+1);
+    var x5y5 = '#' + ((+x)+1) + ((+y)+1);
+    var x7y7 = '#' + ((+x)+1) + ((+y)-1);
+    var x2y2 = '#' + ((+x)-1) + y;
+    var x6y6 = '#' + ((+x)+1) + y;
+    var x4y4 = '#' + x + ((+y)+1);
+    var x8y8 = '#' + x + ((+y)-1);
+    
+    // 1, 3, 5, 7
+    if( CellExist(x1y1[1], x1y1[2]) && $(x1y1).attr('mark') == '2' ){
+	return false;
+    }
+    if( CellExist(x3y3[1], x3y3[2]) && $(x3y3).attr('mark') == '2'){
+	return false;
+    }
+    if( CellExist(x5y5[1], x5y5[2]) && $(x5y5).attr('mark') == '2'){
+	return false;
+    }
+    if( CellExist(x7y7[1], x7y7[2]) && $(x7y7).attr('mark') == '2'){
+	return false;
+    }
+    // 2
+    if( CellExist(x2y2[1], x2y2[2]) && $(x2y2).attr('mark') == '2'){
+	// for 4 at 2
+	if( CellExist(x4y4[1], x4y4[2]) && $(x4y4).attr('mark') == '2'){
+	    return false;
+	}
+	// for 8 at 2
+	if( CellExist(x8y8[1], x8y8[2]) && $(x8y8).attr('mark') == '2'){
+	    return false;
+	}
+    }
+    // 6
+    if( CellExist(x6y6[1], x6y6[2]) && $(x6y6).attr('mark') == '2'){
+	// for 4 at 6
+	if( CellExist(x4y4[1], x4y4[2]) && $(x4y4).attr('mark') == '2'){
+	    return false;
+	}
+	// for 8 at 6
+	if( CellExist(x8y8[1], x8y8[2]) && $(x8y8).attr('mark') == '2'){
+	    return false;
+	}
+    }
+    // 4
+    if( CellExist(x4y4[1], x4y4[2]) && $(x4y4).attr('mark') == '2'){
+	// for 2 at 4
+	if( CellExist(x2y2[1], x2y2[2]) && $(x2y2).attr('mark') == '2'){
+	    return false;
+	}
+	// for 6 at 4
+	if( CellExist(x6y6[1], x6y6[2]) && $(x6y6).attr('mark') == '2'){
+	    return false;
+	}
+    }
+    // 8
+    if( CellExist(x8y8[1], x8y8[2]) && $(x8y8).attr('mark') == '2'){
+	// for 2 at 8
+	if( CellExist(x2y2[1], x2y2[2]) && $(x2y2).attr('mark') == '2'){
+	    return false;
+	}
+	// for 6 at 8
+	if( CellExist(x6y6[1], x6y6[2]) && $(x6y6).attr('mark') == '2'){
+	    return false;
+	}
+    }
+    return true;
+}
+
+ 
+
+// 'x and 'y' - strings
+// TODO: rewrite with one arguments
+function CellExist(x, y){
+    if($("#"+x+y).length){
+	return true;
+    }
+    return false;
+}
 
 function AllRun(){
     field.drawtable();
+    field.get();
     // setInterval(field.get, 3000);
     // setInterval(field.push, 3000);
-}
-
-function FindShip(field){
-    
 }
 
 $(document).ready(AllRun);
