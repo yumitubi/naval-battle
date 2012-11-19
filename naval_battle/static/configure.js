@@ -4,15 +4,21 @@ var field = {
     line_up: false, // default line up false
     field: {},      // field battle array 
     cells: {},      // cells
-    ships: {}       // ships
+    ships: {        // ships 
+	'1': 0,
+	'2': 0,
+	'3': 0, 
+	'4': 0 },  
+    numcell: 0      // num cell on field
 };
 
 ///////////////////////////////////////////////
 // the method draw table
 field.drawtable = function (){
-    var str_table = '<table class="field"></table>';
-    var str_tr = '<tr></tr>';
-    var str_td = '<td></td>';
+    var 
+    str_table = '<table class="field"></table>',
+    str_tr = '<tr></tr>',
+    str_td = '<td></td>';
     
     field.get();
     $('.settings_table').append(str_table);
@@ -39,19 +45,28 @@ field.drawtable = function (){
 	    );
 	    $('#'+i+m).click(
 		function (){
-		    if( $(this).attr('mark') == '0'){
-			if(field.addcell($(this).attr('id'))){
+		    if( $(this).attr('mark') == '0' ){
+			if( field.addcell($(this).attr('id')) && field.numcell<=20 ){
 			    $(this).attr('mark', '2');	
 			    $(this).css('background-color', 'red');
 			    field.field[$(this).attr('id')] = '2';
-			    field.push();
+			    if(field.checkship()){
+				field.push();
+			    } else {
+				$(this).attr('mark', '0');	
+				$(this).css('background-color', 'white');
+				field.field[$(this).attr('id')] = '0';
+			    }
 			} 
 		    } else {
 			$(this).css('background-color', 'white');
 			$(this).attr('mark', '0');
 			field.field[$(this).attr('id')] = '0';
+			field.checkmaximum();
 			field.push();
 		    }
+		    field.checkship();
+		    field.checkmaximum();
 		}
 	    );
     	}
@@ -107,15 +122,15 @@ field.valid = function (){
 
 // add the cell on a field
 field.addcell = function (coordinata){
-    var x = coordinata[0];
-    var y = coordinata[1];
+    var 
+    x = coordinata[0],
+    y = coordinata[1];
     
     if( field.field[coordinata] && CheckCell(x, y)){
 	// alert('добавлено');
 	return true;
-    } else {
-	return false;
-    }
+    } 
+    return false;
 }
 
 
@@ -134,16 +149,18 @@ function CheckCell(x, y){
     // x --- > this row
     // y --- > this column
 
-    var x1y1 = '#' + ((+x)-1) + ((+y)-1);
-    var x3y3 = '#' + ((+x)-1) + ((+y)+1);
-    var x5y5 = '#' + ((+x)+1) + ((+y)+1);
-    var x7y7 = '#' + ((+x)+1) + ((+y)-1);
-    var x2y2 = '#' + ((+x)-1) + y;
-    var x6y6 = '#' + ((+x)+1) + y;
-    var x4y4 = '#' + x + ((+y)+1);
-    var x8y8 = '#' + x + ((+y)-1);
+    var 
+    x1y1 = '#' + ((+x)-1) + ((+y)-1),
+    x3y3 = '#' + ((+x)-1) + ((+y)+1),
+    x5y5 = '#' + ((+x)+1) + ((+y)+1),
+    x7y7 = '#' + ((+x)+1) + ((+y)-1),
+    x2y2 = '#' + ((+x)-1) + y,
+    x6y6 = '#' + ((+x)+1) + y,
+    x4y4 = '#' + x + ((+y)+1),
+    x8y8 = '#' + x + ((+y)-1);
     
     // 1, 3, 5, 7
+    // TODO: use cicle, stupid!
     if( CellExist(x1y1[1], x1y1[2]) && $(x1y1).attr('mark') == '2' ){
 	return false;
     }
@@ -200,6 +217,7 @@ function CheckCell(x, y){
 	    return false;
 	}
     }
+    field.numcell += 1;
     return true;
 }
 
@@ -214,6 +232,86 @@ function CellExist(x, y){
     return false;
 }
 
+// calculate number cell which has mark as '2' - the cell of ship
+field.checkmaximum = function (){
+    field.numcell = 0;
+    for(var i=0; i<10; i++){
+	for(var m=0; m<10; m++){
+	    if( $('#'+i+m).attr('mark') == '2' ){
+		field.numcell += 1;
+	    }
+	}
+    }
+    $('.numcell').text(field.numcell);
+    return field.numcell;
+}
+
+// check number 1, 2, 3 and 4-cell ship
+field.checkship = function (){
+    field.ships['1'] = 0;     
+    field.ships['2'] = 0;     
+    field.ships['3'] = 0;     
+    field.ships['4'] = 0;     
+    for(var i=0; i<10; i++){
+	for(var m=0; m<10; m++){
+	    if( $('#'+i+m).attr('mark') == '2' ){
+		// | x |   |
+		// |---|---|
+		// | x |   |
+		// |---|---|
+		// |   |   |
+		// its first cell in vertical row!
+		if( ((i-1)<0 || $('#'+(i-1)+m).attr('mark') == '0') && 
+		    ((m+1)>9 || $('#'+i+(m+1)).attr('mark') == '0') && 
+		    ((m-1)<0 || $('#'+i+(m-1)).attr('mark') == '0') ){ 
+		    
+		    var flag = true, p = 1;
+		    while( flag == true ){
+			if(p>4){
+			    return false;
+			}
+			if($('#'+(i+p)+m).attr('mark') == '0' || (i+p)>9 ){
+			    field.ships[''+p] += 1;
+			    flag = false;
+			}
+			++p;
+		    }
+		}
+		// |   | x | x | x |   |   |   |
+		// |---|---|---|---|---|---|---
+		// its first cell in gorizontal row!
+		else if( ((m-1)<0 || $('#'+i+(m-1)).attr('mark') == '0') &&
+		         ((i-1)<0 || $('#'+(i-1)+m).attr('mark') == '0') && 
+		         ((i+1)>9 || $('#'+(i+1)+m).attr('mark') == '0')){ 
+
+		    flag = true; 
+		    p = 1;
+		    while( flag == true ){
+			if(p>4){
+			    return false;
+			}
+			if($('#'+i+(p+m)).attr('mark') == '0' || (m+p)>9 ){
+			    field.ships[''+p] += 1;
+			    flag = false;
+			}
+			++p;
+		    }
+		}
+	    }
+	}
+    }
+    for(var i=0; i<5; i++){
+	$('.' + i).text(field.ships[''+i]);
+    }
+    if( field.ships['1']<5 &&
+	field.ships['2']<4 &&
+        field.ships['3']<3 &&
+        field.ships['4']<2 ){
+	    return true;
+	}
+    return false;
+}
+
 function AllRun(){
     field.drawtable();
     field.get();
@@ -223,7 +321,3 @@ function AllRun(){
 
 $(document).ready(AllRun);
 //$(document).ready(alert(JSON.stringify(field.get())), 3000);
-
-
-
-
