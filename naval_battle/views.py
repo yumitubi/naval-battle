@@ -60,10 +60,20 @@ def add_second_user():
     """registration second user for play
     """
     if request.method == 'POST': 
-        pass
-    else: 
-        return render_template('main_page.html', 
-                               user_wait=False)
+        wait_user = request.form['user_id'].encode('utf8')
+        username = request.form['username'].encode('utf8')
+        if request.cookies.has_key('session_id'):
+            cookie_session = request.cookies.get('session_id')
+        else:
+            cookie_session = randstring()
+        field = add_new_field()
+        game = add_field_in_game(field)
+        assert False
+        if add_user_in_db(cookie_session, username, game, field):
+            return jsonify(username=username,
+                           user_id=get_user_id(cookie_session),
+                           new_user=1)
+            
 
 @app.route("/update_data_for_main_page/", methods=['GET', 'POST'])
 def update_data_main_page():

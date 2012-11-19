@@ -9,8 +9,9 @@ function AddNewUser(){
 	success: function(data)
 	{
 	    if (data['new_user']==1){
-		var str = '<tr id="users_wait"><td width="180px">' + data['username']+ '</td><td id="' + data['user_id'] + '"><input class="btn" type="button" name="game" value="Играть!" /></div></td></tr>';
+		var str = '<tr id="users_wait"><td width="180px">' + data['username']+ '</td><td id="' + data['user_id'] + '"><input class="btn" type="button" name="game" value="Играть!" onclick="Configure()/></div></td></tr>';
 		$('.table').append(str);
+		$('#'+data['user_id']).children().click(Configure);
 	    }
 	}
     });
@@ -43,8 +44,48 @@ function UpdateMainPage(data){
     $('#list_gamers').append('<table></table>');
     $('table').attr('class', 'table');
     $.each(data['users'], function(key, val){
-	$('.table').append('<tr id="users_wait"><td width="180px">' + val + '</td><td id="' + key + '"><input class="btn" type="button" name="game" value="Играть!"></td></tr>');
-    });
+	       $('.table').append('<tr id="users_wait"><td width="180px">' + val + '</td><td id="' + key + '"><input class="btn" type="button" name="game" value="Играть!"></td></tr>');
+	       $('#'+key).children('input').click(Configure);
+	   });
+}
+
+// add second player in games
+function Configure(){
+    
+    $.ajax({
+    	       url: '/add_second_user/',
+    	       type: 'post',
+    	       dataType: 'json',
+    	       data: ({"user_id":$(this).parent().attr('id'), 
+		       "username":prompt('Представьтесь, пожалуйста!')}),
+    	       success: function (data){
+		       // window.location.href = "/configure/";
+	       }
+
+    	   });
+}
+
+// get current coolies
+// source - http://www.codenet.ru/webmast/js/Cookies.php
+function getCookie(name) {
+    var 
+    cookie = " " + document.cookie,
+    search = " " + name + "=",
+    setStr = null,
+    offset = 0,
+    end = 0;
+    if (cookie.length > 0) {
+	offset = cookie.indexOf(search);
+	if (offset != -1) {
+	    offset += search.length;
+	    end = cookie.indexOf(";", offset);
+	    if (end == -1) {
+		end = cookie.length;
+	    }
+	    setStr = unescape(cookie.substring(offset, end));
+	}
+    }
+    return(setStr);
 }
 
 // draw information about gamers and games

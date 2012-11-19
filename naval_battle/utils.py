@@ -98,6 +98,20 @@ def add_new_game(new_field):
     new_game.save()
     return new_game
 
+def add_field_in_game(user_id, field):
+    """ add second field in create game other user
+    
+    Arguments:
+    - `user_id`: first user
+    - `field`: second field
+    """
+    first_user = Users.objects.get(id=user_id)
+    game = first_user.game.id
+    second_user = Users.objects.get(field_battle__id=field)
+    second_user.game = game
+    second_user.save()
+    return second_user
+
 def update_field(session_id, field_dict):
     """update data in field
     
