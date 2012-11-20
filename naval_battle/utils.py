@@ -72,8 +72,19 @@ def get_field_dictionary(session_id):
     except:
         return False
 
+def get_user_by_session(session_id):
+    """return objects user 
+    
+    Arguments:
+    - `session_id`: session
+    """
+    try:
+        return Users.objects.get(session=session_id)
+    except:
+        return None
+
 #------------------------------------------------------------
-# add database section
+# add and update database section
 #------------------------------------------------------------
 def add_user_in_db(session, user, game, field, status=0):
     """create user in database for registration in game
@@ -163,3 +174,15 @@ def update_status_user(user_id, status):
         return True
     except:
         return False
+
+#------------------------------------------------------------
+# delete database section
+#------------------------------------------------------------
+
+def drop_user(session_id):
+    """delete user from db, clear game, delete field
+    
+    Arguments:
+    - `session_id`:
+    """
+    return False

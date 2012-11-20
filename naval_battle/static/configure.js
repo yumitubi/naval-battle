@@ -312,6 +312,22 @@ field.checkship = function (){
     return false;
 }
 
+function allReady(){
+    // pass
+}
+
+function allCancel(){
+    // pass
+    $.ajax({
+	url: '/all_cancel/',
+	type: 'post',
+        success: function (data){
+	    window.location.href = "/";
+	}
+    });
+    return false;
+}
+
 function AllRun(){
     field.drawtable();
     field.get();

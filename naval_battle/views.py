@@ -12,7 +12,7 @@ from naval_battle.utils2 import randstring
 # 'from naval_battle.utils import *'
 from naval_battle.utils import add_user_in_db, add_new_game, get_wait_users \
 ,add_new_field, get_user_id, get_begin_games, get_field_dictionary, update_field \
-,add_field_in_game, update_status_user, get_user_status
+,add_field_in_game, update_status_user, get_user_status, drop_user
 
 @app.route("/", methods=['GET', 'POST'])
 def main_page():
@@ -139,6 +139,16 @@ def get_state_field():
                 return jsonify(result='1')
             else:
                 return jsonify(result='0')
+
+@app.route("/get_state_field/", methods=['GET', 'POST'])
+def all_cancel():
+    """reset all data for current game by user
+    """
+    if request.method == 'POST':
+        if request.cookies.has_key('session_id'):
+            cookie_session = request.cookies.get('session_id')
+            result = drop_user(cookie_session)
+            return jsonify(result=result)
         
 @app.route("/move_games/")
 def move_game():
@@ -151,3 +161,4 @@ def archive():
     """page with results old games
     """
     pass
+

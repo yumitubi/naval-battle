@@ -6,19 +6,20 @@
    <script type="text/javascript" src="/static/configure.js"></script>
    <div class="settings_table">
    </div>
-   <div class="numcell">
-   </div>
-   <div class="1">
-     
-   </div>
-   <div class="2">
-     
-   </div>
-   <div class="3">
-     
-   </div>
-   <div class="4">
-     
+   
+   <!-- для тестирования  -->
+   <div class="numcell"></div>
+   <div class="1"></div>
+   <div class="2"></div>
+   <div class="3"></div>
+   <div class="4"></div>
+   <!-- для тестирования  -->
+   <br />
+   <div class="battons">
+     <form method="POST" id="battons" action="">
+       <input class="btn-primary btn-large" id="ready" type="button" name="i_win" value="Готов побеждать!" onclick="allReady()"/>
+       <input class="btn-primary btn-large" id="all_cancel" type="button" name="i_lose" value="Я передумал" onclick="allCancel()" />
+     </form>
    </div>
  </div>
 </div>
