@@ -8,8 +8,11 @@ import json
 from flask import render_template, request, make_response, jsonify
 from naval_battle import app
 from naval_battle.utils2 import randstring
+# TODO: after finish process develop replace on 
+# 'from naval_battle.utils import *'
 from naval_battle.utils import add_user_in_db, add_new_game, get_wait_users \
-,add_new_field, get_user_id, get_begin_games, get_field_dictionary, update_field
+,add_new_field, get_user_id, get_begin_games, get_field_dictionary, update_field \
+,add_field_in_game, update_status_user, get_user_status
 
 @app.route("/", methods=['GET', 'POST'])
 def main_page():
@@ -51,6 +54,7 @@ def add_new_user():
         if add_user_in_db(cookie_session, username, game, field):
             return jsonify(username=username,
                            user_id=get_user_id(cookie_session),
+                           user_status=0, 
                            new_user=1)
         else:
             return jsonify(new_user=0)
@@ -62,16 +66,19 @@ def add_second_user():
     if request.method == 'POST': 
         wait_user = request.form['user_id'].encode('utf8')
         username = request.form['username'].encode('utf8')
+        # TODO: make add user, if he is not in database
         if request.cookies.has_key('session_id'):
             cookie_session = request.cookies.get('session_id')
-        else:
-            cookie_session = randstring()
+        # TODO: this is bottleneck
+        # add exception here!
         field = add_new_field()
-        game = add_field_in_game(field)
-        assert False
-        if add_user_in_db(cookie_session, username, game, field):
+        game = add_field_in_game(wait_user, field)
+        add_user = add_user_in_db(cookie_session, username, game, field, status=1)
+        update_status = update_status_user(wait_user, 1)
+        if add_user and update_status:
             return jsonify(username=username,
                            user_id=get_user_id(cookie_session),
+                           user_status=1,
                            new_user=1)
             
 
@@ -90,6 +97,11 @@ def update_data_main_page():
                  'id':[user1, user2]}}
     """
     if request.method == 'POST':
+        if request.cookies.has_key('session_id'):
+            cookie_session = request.cookies.get('session_id')
+            user_status = get_user_status(cookie_session)
+            if user_status == 1:
+                return jsonify(user_status=user_status)
         users = get_wait_users()
         list_username = {}
         for user in users:

@@ -43,10 +43,15 @@ function UpdateMainPage(data){
     $('#list_gamers').append('<h3>Ждут игры:</h3>');
     $('#list_gamers').append('<table></table>');
     $('table').attr('class', 'table');
-    $.each(data['users'], function(key, val){
-	       $('.table').append('<tr id="users_wait"><td width="180px">' + val + '</td><td id="' + key + '"><input class="btn" type="button" name="game" value="Играть!"></td></tr>');
-	       $('#'+key).children('input').click(Configure);
-	   });
+    alert(JSON.stringify(data));
+    if( data['user_status'] == '1'){
+	window.location.href = "/configure/";
+    } else {
+	$.each(data['users'], function(key, val){
+		   $('.table').append('<tr id="users_wait"><td width="180px">' + val + '</td><td id="' + key + '"><input class="btn" type="button" name="game" value="Играть!"></td></tr>');
+		   $('#'+key).children('input').click(Configure);
+	       });
+    }
 }
 
 // add second player in games
@@ -59,7 +64,8 @@ function Configure(){
     	       data: ({"user_id":$(this).parent().attr('id'), 
 		       "username":prompt('Представьтесь, пожалуйста!')}),
     	       success: function (data){
-		       // window.location.href = "/configure/";
+		   alert(JSON.stringify(data));
+		   window.location.href = "/configure/";
 	       }
 
     	   });

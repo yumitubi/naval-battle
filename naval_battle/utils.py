@@ -41,8 +41,23 @@ def get_user_id(session_id):
     Arguments:
     - `session_id`: session_id
     """
-    user = Users.objects.get(session=session_id)
-    return str(user.id)
+    try:
+        user = Users.objects.get(session=session_id)
+        return str(user.id)
+    except:
+        return None
+
+def get_user_status(session_id):
+    """return user status
+    
+    Arguments:
+    - `session_id`:
+    """
+    try:
+        user = Users.objects.get(session=session_id)
+        return user.status
+    except:
+        return 0
 
 def get_field_dictionary(session_id):
     """ return the current snapshot field
@@ -106,11 +121,10 @@ def add_field_in_game(user_id, field):
     - `field`: second field
     """
     first_user = Users.objects.get(id=user_id)
-    game = first_user.game.id
-    second_user = Users.objects.get(field_battle__id=field)
-    second_user.game = game
-    second_user.save()
-    return second_user
+    game = Games.objects.get(id=first_user.game.id)
+    game.fields.append(field)
+    game.save(cascade=True)
+    return game
 
 def update_field(session_id, field_dict):
     """update data in field
@@ -129,8 +143,23 @@ def update_field(session_id, field_dict):
         user = Users.objects.get(session=session_id)
         field = Fields.objects.get(id=user.field_battle.id)
         field.snapshot = field_dict
-        field.save()
+        field.save(cascade=True)
         return True
     except:
         print 'проверить utils.update_field'
+        return False
+
+def update_status_user(user_id, status):
+    """ make update the status of user
+    
+    Arguments:
+    - `user_id`: user in Users
+    - `status`: status in user.status 
+    """
+    try:
+        user = Users.objects.get(id=user_id)
+        user.status = status
+        user.save(cascade=True)
+        return True
+    except:
         return False
