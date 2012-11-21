@@ -43,7 +43,6 @@ function UpdateMainPage(data){
     $('#list_gamers').append('<h3>Ждут игры:</h3>');
     $('#list_gamers').append('<table></table>');
     $('table').attr('class', 'table');
-    alert(JSON.stringify(data));
     if( data['user_status'] == '1'){
 	window.location.href = "/configure/";
     } else {

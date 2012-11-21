@@ -12,7 +12,7 @@ from naval_battle.utils2 import randstring
 # 'from naval_battle.utils import *'
 from naval_battle.utils import add_user_in_db, add_new_game, get_wait_users \
 ,add_new_field, get_user_id, get_begin_games, get_field_dictionary, update_field \
-,add_field_in_game, update_status_user, get_user_status, drop_user
+,add_field_in_game, update_status_user, get_user_status, drop_user, update_user
 
 @app.route("/", methods=['GET', 'POST'])
 def main_page():
@@ -125,7 +125,9 @@ def send_state_field():
         if request.cookies.has_key('session_id'):
             cookie_session = request.cookies.get('session_id')
             field = get_field_dictionary(cookie_session)
-            return jsonify(field=field)
+            user_status = get_user_status(cookie_session)
+            return jsonify(field=field,
+                           status=user_status)
 
 @app.route("/get_state_field/", methods=['GET', 'POST'])
 def get_state_field():
@@ -140,15 +142,35 @@ def get_state_field():
             else:
                 return jsonify(result='0')
 
-@app.route("/get_state_field/", methods=['GET', 'POST'])
+@app.route("/all_cancel/", methods=['GET', 'POST'])
 def all_cancel():
     """reset all data for current game by user
     """
     if request.method == 'POST':
         if request.cookies.has_key('session_id'):
             cookie_session = request.cookies.get('session_id')
-            result = drop_user(cookie_session)
-            return jsonify(result=result)
+            if drop_user(cookie_session):
+                return jsonify(result=True)
+
+@app.route("/reset_game/", methods=['GET', 'POST'])
+def reset_game():
+    """reset current games
+    """
+    if request.method == 'POST':
+        if request.cookies.has_key('session_id'):
+            cookie_session = request.cookies.get('session_id')
+            field = add_new_field()
+            game = add_new_game(field)
+            new_data_user = { 'game': game,
+                              'field': field,
+                              'session_id': cookie_session }
+            username = update_user(new_data_user)
+            if username:
+                return jsonify(username=username,
+                           user_id=get_user_id(cookie_session),
+                           user_status=0, 
+                           new_user=1)
+            
         
 @app.route("/move_games/")
 def move_game():

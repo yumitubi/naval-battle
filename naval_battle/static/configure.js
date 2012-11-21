@@ -82,7 +82,19 @@ field.get = function (){
 	dataType: 'json',
 	data: ({}),
         success: function (data){
-	    field.field = data["field"];
+	    if(data['status'] == '0'){
+		$.ajax({
+			   url: '/reset_game/',
+			   type: 'post',
+			   success: function (data){
+			       alert('Ваш противник трусливо сбежал с поля боя!');
+			       window.location.href = "/";
+			   }
+		       });
+		
+	    } else {
+		field.field = data["field"];
+	    }
 	}
     });
     return false;
@@ -317,7 +329,6 @@ function allReady(){
 }
 
 function allCancel(){
-    // pass
     $.ajax({
 	url: '/all_cancel/',
 	type: 'post',
@@ -331,7 +342,7 @@ function allCancel(){
 function AllRun(){
     field.drawtable();
     field.get();
-    // setInterval(field.get, 3000);
+    setInterval(field.get, 5000);
     // setInterval(field.push, 3000);
 }
 

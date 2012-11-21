@@ -175,6 +175,29 @@ def update_status_user(user_id, status):
     except:
         return False
 
+def update_user(**kwargs):
+    """ update data for current user
+    
+    Arguments:
+    - `*args`:
+    """
+    if  kwargs.haskey('session_id'):
+        user = Users.objects.get(session=kwargs['session_id'])
+        if kwargs.haskey('game'):
+            game = user.game
+            game.delete()
+            user.game = kwargs['game']
+        if kwargs.haskey('field'):
+            field = user.field
+            field.delete()
+            user.field = kwargs['field']
+        if kwargs.haskey('status'):
+            user.status = kwargs['status']
+        return user.user_name
+    else:
+        return False
+        
+
 #------------------------------------------------------------
 # delete database section
 #------------------------------------------------------------
@@ -185,4 +208,16 @@ def drop_user(session_id):
     Arguments:
     - `session_id`:
     """
-    return False
+    try:
+        user = Users.objects.get(session=session_id)
+        field = user.field_battle
+        game = user.game
+        users = Users.objects(game=game)
+        for u in users:
+            u.status = 0;
+        user.delete()
+        game.delete()
+        field.delete()
+        return True
+    except:
+        return False
