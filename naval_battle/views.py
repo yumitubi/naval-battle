@@ -163,8 +163,9 @@ def reset_game():
             game = add_new_game(field)
             new_data_user = { 'game': game,
                               'field': field,
-                              'session_id': cookie_session }
-            username = update_user(new_data_user)
+                              'session_id': cookie_session,
+                              'status': 0}
+            username = update_user(**new_data_user)
             if username:
                 return jsonify(username=username,
                            user_id=get_user_id(cookie_session),

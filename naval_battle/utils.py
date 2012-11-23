@@ -181,18 +181,15 @@ def update_user(**kwargs):
     Arguments:
     - `*args`:
     """
-    if  kwargs.haskey('session_id'):
+    if  kwargs.has_key('session_id'):
         user = Users.objects.get(session=kwargs['session_id'])
-        if kwargs.haskey('game'):
-            game = user.game
-            game.delete()
+        if kwargs.has_key('game'):
             user.game = kwargs['game']
-        if kwargs.haskey('field'):
-            field = user.field
-            field.delete()
+        if kwargs.has_key('field'):
             user.field = kwargs['field']
-        if kwargs.haskey('status'):
+        if kwargs.has_key('status'):
             user.status = kwargs['status']
+        user.save()
         return user.user_name
     else:
         return False
@@ -215,6 +212,7 @@ def drop_user(session_id):
         users = Users.objects(game=game)
         for u in users:
             u.status = 0;
+            u.save()
         user.delete()
         game.delete()
         field.delete()
