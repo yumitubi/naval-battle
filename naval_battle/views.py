@@ -171,7 +171,14 @@ def reset_game():
                            user_id=get_user_id(cookie_session),
                            user_status=0, 
                            new_user=1)
-            
+
+@app.route("/battle/", methods=['GET', 'POST'])            
+def battle():
+    """a page for configure field battle
+    """
+    current_page = u'Битва!'
+    response = make_response(render_template('battle.html', current_page=current_page))
+    return response
         
 @app.route("/move_games/")
 def move_game():
