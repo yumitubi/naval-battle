@@ -1,7 +1,7 @@
 // configure battle.field
 
 function AllRun(){
-    field.drawtable();
+    field.drawtable('yourfield', 'test');
     field.get();
     field.setclick();
     setInterval(field.get, 1000);

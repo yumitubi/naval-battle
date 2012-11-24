@@ -12,7 +12,8 @@ from naval_battle.utils2 import randstring
 # 'from naval_battle.utils import *'
 from naval_battle.utils import add_user_in_db, add_new_game, get_wait_users \
 ,add_new_field, get_user_id, get_begin_games, get_field_dictionary, update_field \
-,add_field_in_game, update_status_user, get_user_status, drop_user, update_user
+,add_field_in_game, update_status_user, get_user_status, drop_user, update_user \
+,get_value_coordinata
 
 @app.route("/", methods=['GET', 'POST'])
 def main_page():
@@ -191,6 +192,17 @@ def move_battle():
                              'status': 2}
             update_user(**new_data_user)
             return jsonify(result=1)
+@app.route("/check_shot/", methods=['GET', 'POST'])            
+def check_shot():
+    """check a shot and return result of shot
+    """
+    if request.method == 'POST':
+        if request.cookies.has_key('session_id'):
+            cookie_session = request.cookies.get('session_id')
+            coordinata = request.form['coordinata'].encode('utf8')
+            result = get_value_coordinata(cookie_session, coordinata)
+            return jsonify(result=result,
+                           coordinata=coordinata)
         
 @app.route("/move_games/")
 def move_game():

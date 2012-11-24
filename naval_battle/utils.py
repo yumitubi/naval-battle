@@ -83,6 +83,27 @@ def get_user_by_session(session_id):
     except:
         return None
 
+def get_value_coordinata(session_id, coordinata):
+    """ return value cell from database
+    
+    Arguments:
+    - `session_id`: session id shooter
+    - `coordinata`: coordinata
+    """
+    user = Users.objects.get(session = session_id)
+    game = user.game
+    for field in game.fields:
+        if user.field_battle != field:
+            coordict = field.snapshot
+            if coordict[coordinata] == u"0":
+                coordict[coordinata] = u"1"
+                field.snapshot = coordict
+            if coordict[coordinata] == u"2":
+                coordict[coordinata] = u"3"
+                field.snapshot = coordict
+            field.save();
+            return coordict[coordinata]
+
 #------------------------------------------------------------
 # add and update database section
 #------------------------------------------------------------

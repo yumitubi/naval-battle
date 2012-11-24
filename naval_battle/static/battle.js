@@ -1,9 +1,13 @@
 // configure battle.field
 
 function AllRun(){
-    field.drawtable();
+    field.drawtable('yourfield');
+    field.po = 'notyou';
+    field.drawtable('opponentfield');    
+    field.po = 'you';
     field.get();
-    setInterval(field.get, 1000);
+    field.clickshot();
+    setInterval(field.get, 3000);
     // setInterval(field.push, 3000);
 }
 

@@ -1,7 +1,6 @@
 // Main field object for this game
 
 var field = {
-    line_up: false, // default line up false
     field: {},      // field battle array 
     cells: {},      // cells
     ships: {        // ships 
@@ -9,27 +8,27 @@ var field = {
 	'2': 0,
 	'3': 0, 
 	'4': 0 },  
-    numcell: 0,     // num cell on field
-    drawtable: 0
+    numcell: 0,      // num cell on field
+    po: 'you'
 };
 
 ///////////////////////////////////////////////
 // the method draw table
-field.drawtable = function (){
+field.drawtable = function (nameblock){
     var 
-    str_table = '<table class="field"></table>',
+    str_table = '<table class="field'+ nameblock +'"></table>',
     str_tr = '<tr></tr>',
     str_td = '<td></td>';
     
-    $('.settings_table').append(str_table);
+    $('.'+nameblock).append(str_table);
     for(var i=0; i<10; i++){
-    	$('.field').append($(str_tr).attr('id',i));
-    	$('#'+i).css('height','40px');
+    	$('.field'+nameblock).append($(str_tr).attr('id',i+nameblock));
+    	$('#'+i+nameblock).css('height','35px');
     	for(var m=0; m<10; m++){
-    	    $('#'+i).append($(str_td).attr('id', '' + i + m ));
-	    $('#'+i+m).css('border', 'solid 1px');
-	    $('#'+i+m).css('width', '40px');
-	    $('#'+i+m).attr('mark', '0');
+    	    $('#'+i+nameblock).append($(str_td).attr('id', '' + i + m + field.po));
+	    $('#'+i+m+field.po).css('border', 'solid 1px');
+	    $('#'+i+m+field.po).css('width', '35px');
+	    $('#'+i+m+field.po).attr('mark', '0');
     	}
     }
     return false;
@@ -38,7 +37,7 @@ field.drawtable = function (){
 field.setclick = function (){
     for(var i=0; i<10; i++){
 	for(var m=0; m<10; m++){
-	    $('#'+i+m).click(
+	    $('#'+i+m+field.po).click(
 		function (){
 		    if( $(this).attr('mark') == '0' ){
 			if( field.addcell($(this).attr('id')) && field.numcell<=20 ){
@@ -69,11 +68,52 @@ field.setclick = function (){
     return false;
 };
 
+field.clickshot = function (){
+    for(var i=0; i<10; i++){
+	for(var m=0; m<10; m++){
+	    $('#'+i+m+'notyou').click(
+		function (){
+		    var xy = ($(this).attr('id'))[0] + ($(this).attr('id'))[1];
+		    $.ajax({
+			       url: '/check_shot/',
+			       type: 'post',
+			       dataType: 'json',
+			       data: ({"coordinata": xy }),
+			       success: function (data){
+				   switch(data['result']){
+				       case '0':
+				           $('#'+data['coordinata']+'notyou').css('background-color', 'gray');
+				           break;
+				       case '1':
+				           $('#'+data['coordinata']+'notyou').css('background-color', 'gray');
+				           break;
+				       case '2':
+				           $('#'+data['coordinata']+'notyou').css('background-color', 'black');
+				           break;
+				       case '3':
+				           $('#'+data['coordinata']+'notyou').css('background-color', 'black');
+				           break;
+				   }
+			       }
+			   });
+		}
+	    );}
+    }
+    field.po = 'you';
+    return false;
+};
+
 field.update_field = function (){
     for(var i=0; i<10; i++){
 	for(var m=0; m<10; m++){
+	    if(field.field[''+i+m]=='1'){
+		$('#'+i+m+field.po).css('background-color', 'gray');
+	    }
 	    if(field.field[''+i+m]=='2'){
-		$('#'+i+m).css('background-color', 'red');
+		$('#'+i+m+field.po).css('background-color', 'red');
+	    }
+	    if(field.field[''+i+m]=='3'){
+		$('#'+i+m+field.po).css('background-color', 'black');
 	    }
 	}
     }
@@ -114,7 +154,7 @@ field.get = function (){
 field.push = function (){
     for(var i=0; i<10; i++){
 	for(var m=0; m<10; m++){
-	    field.field[''+i+m] = $('#'+i+m).attr('mark');
+	    field.field[''+i+m] = $('#'+i+m+field.po).attr('mark');
 	}
     }
 
@@ -147,7 +187,7 @@ field.addcell = function (coordinata){
     var 
     x = coordinata[0],
     y = coordinata[1];
-    if( field.field[coordinata] && CheckCell(x, y)){
+    if( field.field[x+y] && CheckCell(x, y)){
 	// alert('добавлено');
 	return true;
     } 
@@ -171,14 +211,14 @@ function CheckCell(x, y){
     // y --- > this column
 
     var 
-    x1y1 = '#' + ((+x)-1) + ((+y)-1),
-    x3y3 = '#' + ((+x)-1) + ((+y)+1),
-    x5y5 = '#' + ((+x)+1) + ((+y)+1),
-    x7y7 = '#' + ((+x)+1) + ((+y)-1),
-    x2y2 = '#' + ((+x)-1) + y,
-    x6y6 = '#' + ((+x)+1) + y,
-    x4y4 = '#' + x + ((+y)+1),
-    x8y8 = '#' + x + ((+y)-1);
+    x1y1 = '#' + ((+x)-1) + ((+y)-1) + field.po,
+    x3y3 = '#' + ((+x)-1) + ((+y)+1) + field.po,
+    x5y5 = '#' + ((+x)+1) + ((+y)+1) + field.po,
+    x7y7 = '#' + ((+x)+1) + ((+y)-1) + field.po,
+    x2y2 = '#' + ((+x)-1) + y + field.po,
+    x6y6 = '#' + ((+x)+1) + y + field.po,
+    x4y4 = '#' + x + ((+y)+1) + field.po,
+    x8y8 = '#' + x + ((+y)-1) + field.po;
     
     // 1, 3, 5, 7
     // TODO: use cicle, stupid!
@@ -247,7 +287,7 @@ function CheckCell(x, y){
 // 'x and 'y' - strings
 // TODO: rewrite with one arguments
 function CellExist(x, y){
-    if($("#"+x+y).length){
+    if($("#"+x+y+field.po).length){
 	return true;
     }
     return false;
@@ -258,7 +298,7 @@ field.checkmaximum = function (){
     field.numcell = 0;
     for(var i=0; i<10; i++){
 	for(var m=0; m<10; m++){
-	    if( $('#'+i+m).attr('mark') == '2' ){
+	    if( $('#'+i+m+field.po).attr('mark') == '2' ){
 		field.numcell += 1;
 	    }
 	}
@@ -275,23 +315,23 @@ field.checkship = function (){
     field.ships['4'] = 0;     
     for(var i=0; i<10; i++){
 	for(var m=0; m<10; m++){
-	    if( $('#'+i+m).attr('mark') == '2' ){
+	    if( $('#'+i+m+field.po).attr('mark') == '2' ){
 		// | x |   |
 		// |---|---|
 		// | x |   |
 		// |---|---|
 		// |   |   |
 		// its first cell in vertical row!
-		if( ((i-1)<0 || $('#'+(i-1)+m).attr('mark') == '0') && 
-		    ((m+1)>9 || $('#'+i+(m+1)).attr('mark') == '0') && 
-		    ((m-1)<0 || $('#'+i+(m-1)).attr('mark') == '0') ){ 
+		if( ((i-1)<0 || $('#'+(i-1)+m+field.po).attr('mark') == '0') && 
+		    ((m+1)>9 || $('#'+i+(m+1)+field.po).attr('mark') == '0') && 
+		    ((m-1)<0 || $('#'+i+(m-1)+field.po).attr('mark') == '0') ){ 
 		    
 		    var flag = true, p = 1;
 		    while( flag == true ){
 			if(p>4){
 			    return false;
 			}
-			if($('#'+(i+p)+m).attr('mark') == '0' || (i+p)>9 ){
+			if($('#'+(i+p)+m+field.po).attr('mark') == '0' || (i+p)>9 ){
 			    field.ships[''+p] += 1;
 			    flag = false;
 			}
@@ -301,9 +341,9 @@ field.checkship = function (){
 		// |   | x | x | x |   |   |   |
 		// |---|---|---|---|---|---|---
 		// its first cell in gorizontal row!
-		else if( ((m-1)<0 || $('#'+i+(m-1)).attr('mark') == '0') &&
-		         ((i-1)<0 || $('#'+(i-1)+m).attr('mark') == '0') && 
-		         ((i+1)>9 || $('#'+(i+1)+m).attr('mark') == '0')){ 
+		else if( ((m-1)<0 || $('#'+i+(m-1)+field.po).attr('mark') == '0') &&
+		         ((i-1)<0 || $('#'+(i-1)+m+field.po).attr('mark') == '0') && 
+		         ((i+1)>9 || $('#'+(i+1)+m+field.po).attr('mark') == '0')){ 
 
 		    flag = true; 
 		    p = 1;
@@ -311,7 +351,7 @@ field.checkship = function (){
 			if(p>4){
 			    return false;
 			}
-			if($('#'+i+(p+m)).attr('mark') == '0' || (m+p)>9 ){
+			if($('#'+i+(p+m)+field.po).attr('mark') == '0' || (m+p)>9 ){
 			    field.ships[''+p] += 1;
 			    flag = false;
 			}
