@@ -2,6 +2,7 @@
 
 var field = {
     field: {},      // field battle array 
+    field_two: {},  // field battle of opponent 
     cells: {},      // cells
     ships: {        // ships 
 	'1': 0,
@@ -9,7 +10,8 @@ var field = {
 	'3': 0, 
 	'4': 0 },  
     numcell: 0,      // num cell on field
-    po: 'you'
+    po: 'you',
+    user: 'wait'
 };
 
 ///////////////////////////////////////////////
@@ -34,6 +36,7 @@ field.drawtable = function (nameblock){
     return false;
 };
 
+// this method set a event by click for settings field
 field.setclick = function (){
     for(var i=0; i<10; i++){
 	for(var m=0; m<10; m++){
@@ -43,7 +46,7 @@ field.setclick = function (){
 			if( field.addcell($(this).attr('id')) && field.numcell<=20 ){
 			    $(this).attr('mark', '2');	
 			    $(this).css('background-color', 'red');
-			    field.field[$(this).attr('id')] = '2';
+				field.field[$(this).attr('id')] = '2';
 			    if(field.checkship()){
 				field.push();
 			    } else {
@@ -61,41 +64,48 @@ field.setclick = function (){
 		    }
 		    field.checkship();
 		    field.checkmaximum();
-		}
+		    }
 	    );	    
 	}
     }
     return false;
 };
 
+// this method set a event by click for shooting
 field.clickshot = function (){
     for(var i=0; i<10; i++){
 	for(var m=0; m<10; m++){
 	    $('#'+i+m+'notyou').click(
 		function (){
-		    var xy = ($(this).attr('id'))[0] + ($(this).attr('id'))[1];
-		    $.ajax({
-			       url: '/check_shot/',
-			       type: 'post',
-			       dataType: 'json',
-			       data: ({"coordinata": xy }),
-			       success: function (data){
-				   switch(data['result']){
-				       case '0':
+		    if(field.user == 'go'){
+			field.user = 'wait';
+			var xy = ($(this).attr('id'))[0] + ($(this).attr('id'))[1];
+			$.ajax({
+				   url: '/check_shot/',
+				   type: 'post',
+				   dataType: 'json',
+				   data: ({"coordinata": xy }),
+				   success: function (data){
+				       field.field_two = data['field_opponent'];
+				       field.update_field_two();
+				       switch(data['result']){
+		 		           case '0':
 				           $('#'+data['coordinata']+'notyou').css('background-color', 'gray');
 				           break;
-				       case '1':
+				           case '1':
 				           $('#'+data['coordinata']+'notyou').css('background-color', 'gray');
 				           break;
-				       case '2':
+				           case '2':
 				           $('#'+data['coordinata']+'notyou').css('background-color', 'black');
 				           break;
-				       case '3':
+				           case '3':
 				           $('#'+data['coordinata']+'notyou').css('background-color', 'black');
 				           break;
+				       }
+
 				   }
-			       }
-			   });
+			       });
+		    }
 		}
 	    );}
     }
@@ -103,6 +113,7 @@ field.clickshot = function (){
     return false;
 };
 
+// update view field from field.field
 field.update_field = function (){
     for(var i=0; i<10; i++){
 	for(var m=0; m<10; m++){
@@ -117,7 +128,21 @@ field.update_field = function (){
 	    }
 	}
     }
-}
+};
+
+// update view field from field.field
+field.update_field_two = function (){
+    for(var i=0; i<10; i++){
+	for(var m=0; m<10; m++){
+	    if(field.field_two[''+i+m]=='1'){
+		$('#'+i+m+'notyou').css('background-color', 'gray');
+	    }
+	    if(field.field_two[''+i+m]=='3'){
+		$('#'+i+m+'notyou').css('background-color', 'black');
+	    }
+	}
+    }
+};
 
 // the method get a data from server
 field.get = function (){
@@ -127,12 +152,12 @@ field.get = function (){
 	dataType: 'json',
 	data: ({}),
         success: function (data){
-	    if(data['status'] == '0'){ // checking is the status of opponent 
+	    if(data['status'] == '0'){ // checking is the status  
 		$.ajax({
 			   url: '/reset_game/',
 			   type: 'post',
 			   success: function (data){
-			       alert('Ваш противник трусливо сбежал с поля боя!');
+			       alert('Ваш противник трусливо сбежал с моря боя!');
 			       window.location.href = "/";
 			   }
 		       });
@@ -141,10 +166,34 @@ field.get = function (){
 	    } else if(data['status'] == '2'){
 	    	field.field = data["field"];
 		field.update_field();
+	    } else if(data['status'] == '3'){
+	    	field.field = data["field"];
+		field.user = 'go';
+		$('#status_go').text('Ваш ход!');
+		field.update_field();
+	    } else if(data['status'] == '4'){
+	    	field.field = data["field"];
+		field.user = 'wait';
+		$('#status_go').text('Ожидайте соперника!');
+		field.update_field();
 	    } else {
 		alert('Игра прервана');
 		window.location.href = "/";
 	    }
+	}
+    });
+    return false;
+};
+
+// get data from database and update opponents' field
+field.get_field_two = function (){
+    $.ajax({
+        url: '/get_field_two/',
+	type: 'post',
+	dataType: 'json',
+        success: function (data){
+	    field.field_two = data['field_opponent'];
+	    field.update_field_two();
 	}
     });
     return false;
@@ -174,14 +223,6 @@ field.push = function (){
     return false;
 };
 
-// run validate of field
-field.valid = function (){
-    // TODO:
-    // - handler 
-    // - send a status
-    return false;
-}
-
 // add the cell on a field
 field.addcell = function (coordinata){
     var 
@@ -192,7 +233,7 @@ field.addcell = function (coordinata){
 	return true;
     } 
     return false;
-}
+};
 
 
 // other functions
@@ -305,7 +346,7 @@ field.checkmaximum = function (){
     }
     $('.numcell').text(field.numcell);
     return field.numcell;
-}
+};
 
 // check number 1, 2, 3 and 4-cell ship
 field.checkship = function (){
@@ -371,7 +412,7 @@ field.checkship = function (){
 	    return true;
 	}
     return false;
-}
+};
 
 // batton ready for battle
 function allReady(){

@@ -4,7 +4,7 @@ function AllRun(){
     field.drawtable('yourfield', 'test');
     field.get();
     field.setclick();
-    setInterval(field.get, 1000);
+    setInterval(field.get, 5000);
     // setInterval(field.push, 3000);
 }
 

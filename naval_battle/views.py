@@ -13,7 +13,7 @@ from naval_battle.utils2 import randstring
 from naval_battle.utils import add_user_in_db, add_new_game, get_wait_users \
 ,add_new_field, get_user_id, get_begin_games, get_field_dictionary, update_field \
 ,add_field_in_game, update_status_user, get_user_status, drop_user, update_user \
-,get_value_coordinata
+,get_value_coordinata, get_field_opponent
 
 @app.route("/", methods=['GET', 'POST'])
 def main_page():
@@ -189,7 +189,7 @@ def move_battle():
         if request.cookies.has_key('session_id'):
             cookie_session = request.cookies.get('session_id')
             new_data_user = {'session_id':cookie_session,
-                             'status': 2}
+                             'status': 4 }
             update_user(**new_data_user)
             return jsonify(result=1)
 @app.route("/check_shot/", methods=['GET', 'POST'])            
@@ -201,8 +201,20 @@ def check_shot():
             cookie_session = request.cookies.get('session_id')
             coordinata = request.form['coordinata'].encode('utf8')
             result = get_value_coordinata(cookie_session, coordinata)
+            field_opponent = get_field_opponent(cookie_session)
             return jsonify(result=result,
-                           coordinata=coordinata)
+                           coordinata=coordinata,
+                           field_opponent=field_opponent)
+
+@app.route("/get_field_two/", methods=['GET', 'POST'])            
+def get_field_two():
+    """return field by opponent
+    """
+    if request.method == 'POST':
+        if request.cookies.has_key('session_id'):
+            cookie_session = request.cookies.get('session_id')
+            field_opponent = get_field_opponent(cookie_session)    
+            return jsonify(field_opponent=field_opponent)
         
 @app.route("/move_games/")
 def move_game():

@@ -95,6 +95,11 @@ def get_value_coordinata(session_id, coordinata):
     for field in game.fields:
         if user.field_battle != field:
             coordict = field.snapshot
+            user.status = 4
+            user.save()
+            other_user = Users.objects.get(field_battle=field)
+            other_user.status = 3
+            other_user.save()
             if coordict[coordinata] == u"0":
                 coordict[coordinata] = u"1"
                 field.snapshot = coordict
@@ -103,6 +108,25 @@ def get_value_coordinata(session_id, coordinata):
                 field.snapshot = coordict
             field.save();
             return coordict[coordinata]
+
+def get_field_opponent(session_id):
+    """ return field by opponent
+    
+    Arguments:
+    - `session_id`:
+    """
+    user = Users.objects.get(session=session_id)
+    for u in Users.objects(game=user.game):
+        if u.session != session_id:
+            field = u.field_battle
+            snapshot = field.snapshot
+            visible_snapshot = {}
+            for key, val in snapshot.iteritems():
+                if val == u"2":
+                    visible_snapshot[key] = u"0"
+                else:
+                    visible_snapshot[key] = val
+            return visible_snapshot
 
 #------------------------------------------------------------
 # add and update database section
@@ -212,6 +236,12 @@ def update_user(**kwargs):
             field.save()
             user.field_battle = kwargs['field']
         if kwargs.has_key('status'):
+            if kwargs['status'] == 4:
+                users = Users.objects(game=user.game)
+                for u in users:
+                    if u.session != user.session and u.status == 4:
+                        u.status = 3
+                        u.save()
             user.status = kwargs['status']
         user.save()
         return user.user_name
