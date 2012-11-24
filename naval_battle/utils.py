@@ -183,12 +183,12 @@ def update_user(**kwargs):
     """
     if  kwargs.has_key('session_id'):
         user = Users.objects.get(session=kwargs['session_id'])
-        field = user.field_battle
-        field.delete()
-        field.save
         if kwargs.has_key('game'):
             user.game = kwargs['game']
         if kwargs.has_key('field'):
+            field = user.field_battle
+            field.delete()
+            field.save()
             user.field_battle = kwargs['field']
         if kwargs.has_key('status'):
             user.status = kwargs['status']

@@ -3,7 +3,7 @@
 function AllRun(){
     field.drawtable();
     field.get();
-    setInterval(field.get, 5000);
+    setInterval(field.get, 1000);
     // setInterval(field.push, 3000);
 }
 

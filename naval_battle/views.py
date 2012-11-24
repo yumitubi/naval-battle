@@ -111,7 +111,7 @@ def update_data_main_page():
 
 @app.route("/configure/", methods=['GET', 'POST'])
 def configure():
-    """a page for configure field battle
+    """the page for configure field battle
     """
     current_page = u'Настроить расположение фрегатов'
     response = make_response(render_template('configure.html', current_page=current_page))
@@ -179,6 +179,18 @@ def battle():
     current_page = u'Битва!'
     response = make_response(render_template('battle.html', current_page=current_page))
     return response
+
+@app.route("/move_battle/", methods=['GET', 'POST'])            
+def move_battle():
+    """move to battle
+    """
+    if request.method == 'POST':
+        if request.cookies.has_key('session_id'):
+            cookie_session = request.cookies.get('session_id')
+            new_data_user = {'session_id':cookie_session,
+                             'status': 2}
+            update_user(**new_data_user)
+            return jsonify(result=1)
         
 @app.route("/move_games/")
 def move_game():

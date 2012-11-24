@@ -9,7 +9,8 @@ var field = {
 	'2': 0,
 	'3': 0, 
 	'4': 0 },  
-    numcell: 0      // num cell on field
+    numcell: 0,     // num cell on field
+    drawtable: 0
 };
 
 ///////////////////////////////////////////////
@@ -20,9 +21,7 @@ field.drawtable = function (){
     str_tr = '<tr></tr>',
     str_td = '<td></td>';
     
-    field.get();
     $('.settings_table').append(str_table);
-    
     for(var i=0; i<10; i++){
     	$('.field').append($(str_tr).attr('id',i));
     	$('#'+i).css('height','40px');
@@ -31,18 +30,14 @@ field.drawtable = function (){
 	    $('#'+i+m).css('border', 'solid 1px');
 	    $('#'+i+m).css('width', '40px');
 	    $('#'+i+m).attr('mark', '0');
-	    
+    	}
+    }
+    return false;
+};
 
-	    $('#'+i+m).hover(
-		function (){
-		    $(this).css('background-color', 'red');
-		},
-		function (){
-		    if($(this).attr('mark') != '2'){
-			$(this).css('background-color', 'white');
-		    }
-		}
-	    );
+field.setclick = function (){
+    for(var i=0; i<10; i++){
+	for(var m=0; m<10; m++){
 	    $('#'+i+m).click(
 		function (){
 		    if( $(this).attr('mark') == '0' ){
@@ -68,11 +63,21 @@ field.drawtable = function (){
 		    field.checkship();
 		    field.checkmaximum();
 		}
-	    );
-    	}
+	    );	    
+	}
     }
     return false;
 };
+
+field.update_field = function (){
+    for(var i=0; i<10; i++){
+	for(var m=0; m<10; m++){
+	    if(field.field[''+i+m]=='2'){
+		$('#'+i+m).css('background-color', 'red');
+	    }
+	}
+    }
+}
 
 // the method get a data from server
 field.get = function (){
@@ -82,7 +87,7 @@ field.get = function (){
 	dataType: 'json',
 	data: ({}),
         success: function (data){
-	    if(data['status'] == '0'){
+	    if(data['status'] == '0'){ // checking is the status of opponent 
 		$.ajax({
 			   url: '/reset_game/',
 			   type: 'post',
@@ -91,9 +96,14 @@ field.get = function (){
 			       window.location.href = "/";
 			   }
 		       });
-		
-	    } else {
+	    } else if(data['status'] == '1'){
 		field.field = data["field"];
+	    } else if(data['status'] == '2'){
+	    	field.field = data["field"];
+		field.update_field();
+	    } else {
+		alert('Игра прервана');
+		window.location.href = "/";
 	    }
 	}
     });
@@ -137,7 +147,6 @@ field.addcell = function (coordinata){
     var 
     x = coordinata[0],
     y = coordinata[1];
-    
     if( field.field[coordinata] && CheckCell(x, y)){
 	// alert('добавлено');
 	return true;
@@ -324,10 +333,23 @@ field.checkship = function (){
     return false;
 }
 
+// batton ready for battle
 function allReady(){
-    // pass
+    if( field.checkship() && field.numcell==20 ){
+	$.ajax({
+		   url: '/move_battle/',
+		   type: 'post',
+		   success: function (data){
+		       window.location.href = "/battle/";
+		   }
+	       });
+    } else {
+	alert('Расставьте все корабли!');
+    }
+    return false;
 }
 
+// loser
 function allCancel(){
     $.ajax({
 	url: '/all_cancel/',
