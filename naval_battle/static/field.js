@@ -97,9 +97,13 @@ field.clickshot = function (){
 				           break;
 				           case '2':
 				           $('#'+data['coordinata']+'notyou').css('background-color', 'black');
+					   field.user = 'go';
+					   $('#status_go').text('Ваш ход!');
 				           break;
 				           case '3':
 				           $('#'+data['coordinata']+'notyou').css('background-color', 'black');
+					   field.user = 'go';
+					   $('#status_go').text('Ваш ход!');
 				           break;
 				       }
 

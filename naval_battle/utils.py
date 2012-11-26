@@ -85,6 +85,9 @@ def get_user_by_session(session_id):
 
 def get_value_coordinata(session_id, coordinata):
     """ return value cell from database
+
+    if user.status == 4, then user wait move
+    if user.status == 3, then user go
     
     Arguments:
     - `session_id`: session id shooter
@@ -95,13 +98,13 @@ def get_value_coordinata(session_id, coordinata):
     for field in game.fields:
         if user.field_battle != field:
             coordict = field.snapshot
-            user.status = 4
-            user.save()
             other_user = Users.objects.get(field_battle=field)
-            other_user.status = 3
-            other_user.save()
             if coordict[coordinata] == u"0":
                 coordict[coordinata] = u"1"
+                user.status = 4
+                user.save()
+                other_user.status = 3
+                other_user.save()
                 field.snapshot = coordict
             if coordict[coordinata] == u"2":
                 coordict[coordinata] = u"3"
