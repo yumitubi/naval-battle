@@ -79,12 +79,13 @@ field.clickshot = function (){
 		function (){
 		    if(field.user == 'go'){
 			field.user = 'wait';
-			var xy = ($(this).attr('id'))[0] + ($(this).attr('id'))[1];
+			var 
+			xy = ($(this).attr('id'))[0] + ($(this).attr('id'))[1];
 			$.ajax({
 				   url: '/check_shot/',
 				   type: 'post',
 				   dataType: 'json',
-				   data: ({"coordinata": xy }),
+				   data: ({"coordinata": xy}),
 				   success: function (data){
 				       field.field_two = data['field_opponent'];
 				       field.update_field_two();
@@ -116,6 +117,45 @@ field.clickshot = function (){
     field.po = 'you';
     return false;
 };
+
+// check cells around by cell with coordinate 'xy' 
+// field.getcellsaround = function (xy){
+//     var 
+//     aroundcoords = {},
+//     x = xy[0],
+//     y = xy[1];
+    
+//     aroundcoords.top = {};
+//     for(var i=1; i<4; i++){
+// 	if( (+x)-i >= 0 ){
+// 	    aroundcoords.top[''+i] = ''+ (+x - i) + y;	    
+// 	}
+//     }
+//     aroundcoords.bottom = {};
+//     for(var i=1; i<4; i++){
+// 	if( (+x)+i <= 9 ){
+// 	    aroundcoords.bottom[''+i] = ''+ (+x + i) + y;	    
+// 	}
+//     }
+//     aroundcoords.left = {};
+//     for(var i=1; i<4; i++){
+// 	if( (+y)-i >= 0 ){
+// 	    aroundcoords.left[''+i] = ''+ x + (+y + 1);	    
+// 	}
+//     }
+//     aroundcoords.right = {};
+//     for(var i=1; i<4; i++){
+// 	if( (+y)+i <= 9 ){
+// 	    aroundcoords.right[''+i] = ''+ x + (+y + 1);	    
+// 	}
+//     }
+//     return aroundcoords;
+// };
+
+// coloring the cells around cell(xy) if ship kill
+// field.colorcellaround = function (xy){
+    
+// };
 
 // update view field from field.field
 field.update_field = function (){

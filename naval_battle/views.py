@@ -200,11 +200,13 @@ def check_shot():
         if request.cookies.has_key('session_id'):
             cookie_session = request.cookies.get('session_id')
             coordinata = request.form['coordinata'].encode('utf8')
-            result = get_value_coordinata(cookie_session, coordinata)
+            coordsaround = json.loads(request.form['coords'])
+            result, not_kill_flag = get_value_coordinata(cookie_session, coordinata, coordsaround)
             field_opponent = get_field_opponent(cookie_session)
             return jsonify(result=result,
                            coordinata=coordinata,
-                           field_opponent=field_opponent)
+                           field_opponent=field_opponent,
+                           not_kill_flag=not_kill_flag)
 
 @app.route("/get_field_two/", methods=['GET', 'POST'])            
 def get_field_two():

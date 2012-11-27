@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from models import Fields, Users, Games
+from utils2 import get_around_cells
 
 #------------------------------------------------------------
 # get database section
@@ -83,7 +84,7 @@ def get_user_by_session(session_id):
     except:
         return None
 
-def get_value_coordinata(session_id, coordinata):
+def get_value_coordinata(session_id, coordinata, coordsaround):
     """ return value cell from database
 
     if user.status == 4, then user wait move
@@ -92,6 +93,7 @@ def get_value_coordinata(session_id, coordinata):
     Arguments:
     - `session_id`: session id shooter
     - `coordinata`: coordinata
+    - `coordsaround`: 
     """
     user = Users.objects.get(session = session_id)
     game = user.game
@@ -107,10 +109,81 @@ def get_value_coordinata(session_id, coordinata):
                 other_user.save()
                 field.snapshot = coordict
             if coordict[coordinata] == u"2":
+                not_kill_flag = False
+                x = coordinata[0]
+                y = coordinata[1]
+                graycells = []
+                # for self cell
+                cells = get_around_cells(int(x), int(y))
+                for cell in cells:
+                    if coordict[cell] == "1" or coordict[cell] == "0":
+                        graycells.append(cell)
+                # top cells
+                for i in [1, 2, 3]:
+                    if not_kill_flag:
+                        break
+                    if coordict[str(int(x)-i)+y] == "2":
+                        not_kill_flag = True
+                    if coordict[str(int(x)-i)+y] == "2" or coordict[str(int(x)-i)+y] == "3":
+                        cells = get_around_cells((int(x)-i), int(y))
+                        for cell in cells:
+                            if coordict[cell] == "1" or coordict[cell] == "0":
+                                graycells.append(cell)
+                # bottom cells
+                for i in [1, 2, 3]:
+                    if not_kill_flag:
+                        break
+                    if coordict[str(int(x)+i)+y] == "2":
+                        not_kill_flag = True
+                        break
+                    if coordict[str(int(x)+i)+y] == "2" or coordict[str(int(x)+i)+y] == "3":
+                        cells = get_around_cells((int(x)+i), int(y))
+                        for cell in cells:
+                            if coordict[cell] == "1" or coordict[cell] == "0":
+                                graycells.append(cell)
+                # left cells
+                for i in [1, 2, 3]:
+                    if not_kill_flag:
+                        break
+                    if coordict[x+str(int(y)-1)] == "2":
+                        not_kill_flag = True
+                        break
+                    if coordict[x+str(int(y)-1)] == "2" or coordict[x+str(int(y)-1)] ==  "3":
+                        cells = get_around_cells(int(x), int(y)-1)
+                        for cell in cells:
+                            if coordict[cell] == "1" or coordict[cell] == "0":
+                                graycells.append(cell)
+                # right cells
+                for i in [1, 2, 3]:
+                    if not_kill_flag:
+                        break
+                    if coordict[x+str(int(y)+1)] == "2":
+                        not_kill_flag = True
+                        break
+                    if coordict[x+str(int(y)+1)] == "2" or coordict[x+str(int(y)+1)] == "3":
+                        cells = get_around_cells(int(x), int(y)+1)
+                        for cell in cells:
+                            if coordict[cell] == "1" or coordict[cell] == "0":
+                                graycells.append(cell)
+                
+                # get uniq cells
+                graycells = list(set(graycells))
+
+                for key in coordsaround:
+                    if not_kill_flag:
+                        break
+                    for i in range(3):
+                        if coordsaround[key].has_key(str(i+1)):
+                            val = coordict[coordsaround[key][str(i+1)]]
+                            if val == "2":
+                                not_kill_flag = True
+                                break
+                            if val == "0" or val == "1":
+                                break
                 coordict[coordinata] = u"3"
                 field.snapshot = coordict
             field.save();
-            return coordict[coordinata]
+            return coordict[coordinata], not_kill_flag
 
 def get_field_opponent(session_id):
     """ return field by opponent
