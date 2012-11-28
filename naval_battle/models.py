@@ -48,7 +48,8 @@ class Users(db.Document):
                 `2` - user in games
                 `3` - user go
                 `4` - user wait move 
-                `5` - user final game
+                `5` - user final game - win
+                `6` - user final game - lose
     """
     user_name = db.StringField(max_length=255, required=True)
     session = db.StringField(max_length=255, required=True)

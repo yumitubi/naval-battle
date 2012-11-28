@@ -40,6 +40,7 @@ def get_around_cells(x, y):
     for i in range(10):
         for m in range(10):
            field.append(str(i)+str(m))
+
     coordinates.append(str(x-1)+str(y-1))
     coordinates.append(str(x-1)+str(y))
     coordinates.append(str(x-1)+str(y+1))
@@ -53,5 +54,4 @@ def get_around_cells(x, y):
         if coord in field:
             valid_coords.append(coord)
 
-    print valid_coords
     return valid_coords

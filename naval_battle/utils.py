@@ -2,6 +2,7 @@
 
 from models import Fields, Users, Games
 from utils2 import get_around_cells
+import pdb
 
 #------------------------------------------------------------
 # get database section
@@ -123,10 +124,12 @@ def get_value_coordinata(session_id, coordinata):
                     if not_kill_flag:
                         break
                     if coordict.has_key(str(int(x)-i)+y): 
+                        if coordict[str(int(x)-i)+y] == "0" or coordict[str(int(x)-i)+y] == "1":
+                            break
                         if coordict[str(int(x)-i)+y] == "2":
                             not_kill_flag = True
                             break
-                        if coordict[str(int(x)-i)+y] == "2" or coordict[str(int(x)-i)+y] == "3":
+                        if coordict[str(int(x)-i)+y] == "3":
                             cells = get_around_cells((int(x)-i), int(y))
                             for cell in cells:
                                 if coordict[cell] == "1" or coordict[cell] == "0":
@@ -136,10 +139,12 @@ def get_value_coordinata(session_id, coordinata):
                     if not_kill_flag:
                         break
                     if coordict.has_key(str(int(x)+i)+y): 
+                        if coordict[str(int(x)+i)+y] == "0" or coordict[str(int(x)+i)+y] == "0":
+                            break
                         if coordict[str(int(x)+i)+y] == "2":
                             not_kill_flag = True
                             break
-                        if coordict[str(int(x)+i)+y] == "2" or coordict[str(int(x)+i)+y] == "3":
+                        if coordict[str(int(x)+i)+y] == "3":
                             cells = get_around_cells((int(x)+i), int(y))
                             for cell in cells:
                                 if coordict[cell] == "1" or coordict[cell] == "0":
@@ -148,12 +153,14 @@ def get_value_coordinata(session_id, coordinata):
                 for i in [1, 2, 3]:
                     if not_kill_flag:
                         break
-                    if coordict.has_key(x+str(int(y)-1)): 
-                        if coordict[x+str(int(y)-1)] == "2":
+                    if coordict.has_key(x+str(int(y)-i)): 
+                        if coordict[x+str(int(y)-i)] == "0" or coordict[x+str(int(y)-i)] == "1":
+                            break
+                        if coordict[x+str(int(y)-i)] == "2":
                             not_kill_flag = True
                             break
-                        if coordict[x+str(int(y)-1)] == "2" or coordict[x+str(int(y)-1)] ==  "3":
-                            cells = get_around_cells(int(x), int(y)-1)
+                        if coordict[x+str(int(y)-i)] ==  "3":
+                            cells = get_around_cells(int(x), int(y)-i)
                             for cell in cells:
                                 if coordict[cell] == "1" or coordict[cell] == "0":
                                     graycells.append(cell)
@@ -161,19 +168,20 @@ def get_value_coordinata(session_id, coordinata):
                 for i in [1, 2, 3]:
                     if not_kill_flag:
                         break
-                    if coordict.has_key(x+str(int(y)+1)): 
-                        if coordict[x+str(int(y)+1)] == "2":
+                    if coordict.has_key(x+str(int(y)+i)): 
+                        if coordict[x+str(int(y)+i)] == "0" or coordict[x+str(int(y)+i)] == "1":
+                            break
+                        if coordict[x+str(int(y)+i)] == "2":
                             not_kill_flag = True
                             break
-                        if coordict[x+str(int(y)+1)] == "2" or coordict[x+str(int(y)+1)] == "3":
-                            cells = get_around_cells(int(x), int(y)+1)
+                        if coordict[x+str(int(y)+i)] == "3":
+                            cells = get_around_cells(int(x), int(y)+i)
                             for cell in cells:
                                 if coordict[cell] == "1" or coordict[cell] == "0":
                                     graycells.append(cell)
                 
                 # get uniq cells
                 graycells = list(set(graycells))
-                print graycells
 
                 # push results calculates in db
                 if not not_kill_flag:

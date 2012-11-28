@@ -79,6 +79,7 @@ field.clickshot = function (){
 		function (){
 		    if(field.user == 'go'){
 			field.user = 'wait';
+			$('#status_go').text('Проверка!');
 			var 
 			xy = ($(this).attr('id'))[0] + ($(this).attr('id'))[1];
 			$.ajax({
@@ -99,7 +100,7 @@ field.clickshot = function (){
 				           case '2':
 				           $('#'+data['coordinata']+'notyou').css('background-color', 'black');
 					   field.user = 'go';
-					   $('#status_go').text('Ваш ход!');
+ 					   $('#status_go').text('Ваш ход!');
 				           break;
 				           case '3':
 				           $('#'+data['coordinata']+'notyou').css('background-color', 'black');
@@ -179,7 +180,17 @@ field.get = function (){
 	    } else if(data['status'] == '4'){
 	    	field.field = data["field"];
 		field.user = 'wait';
-		$('#status_go').text('Ожидайте соперника!');
+		$('#status_go').text('Ожидайте хода соперника!');
+		field.update_field();
+	    } else if(data['status'] == '5'){
+	    	field.field = data["field"];
+		field.user = 'win';
+		$('#status_go').text('Тысяча чертей, Вы победили!');
+		field.update_field();
+	    } else if(data['status'] == '6'){
+	    	field.field = data["field"];
+		field.user = 'lose';
+		$('#status_go').text('Вы проиграли!');
 		field.update_field();
 	    } else {
 		alert('Игра прервана');
