@@ -1,5 +1,9 @@
 # my css file
 
+body {
+    background-image: url(/static/images/fonimage.png); 
+}
+
 .field {
     border: 1px solid #FF0000;
 }

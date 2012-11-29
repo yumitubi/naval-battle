@@ -216,11 +216,13 @@ def get_field_two():
             field_opponent = get_field_opponent(cookie_session)    
             return jsonify(field_opponent=field_opponent)
         
-@app.route("/move_games/")
+@app.route("/move_game/")
 def move_game():
     """page for watch game
     """
-    pass
+    current_page = u'Ход игры'
+    response = make_response(render_template('move_game.html', current_page=current_page))
+    return response
 
 @app.route("/archive/")
 def archive():

@@ -2,35 +2,28 @@
 
 {% block content %}
 <div class="span12">
- <div class="row">
-    <div class="span4">
+  <div class="row">
+    <div class="span12">
       <div id="add_new_user">
 	<script type="text/javascript" src="/static/naval_battle.js"></script>
 	<form class="form-seach">
           <div class="input-append">
-            <input type="text" class="span4" name="username">
+            <input type="text" class="span3" name="username">
             <button type="button" class="btn" onclick="AddNewUser(); return false">Создать сервер!</button>
           </div>
 	</form>
-  	<div id="list_gamers">
-
-
-	  <!-- <div class="span4"> -->
-	  <!--   <h3>Ждут игры:</h3> -->
-	  <!--   <table class="table"> -->
-	  <!--     {% for user in users_wait %} -->
-	  <!--     <tr id="users_wait"> -->
-	  <!-- 	<td><div id="{{ user.id }}">{{ user.user_name}}</td> -->
-	  <!-- 	<td><input class="btn" type="button" name="game" value="Играть!" /></div></td> -->
-          <!--     </tr> -->
-          <!--     {% endfor %} -->
-          <!--   </table> -->
-          <!-- </div> -->
-
-
-	</div> 
       </div>
+    <div class="span3">
+      <div id="list_players">
+	<table class="table players"></table>
+      </div>       
     </div>
-</div>
+    <div class="span1"></div>
+    <div class="span5">
+      <div id="list_games">
+	<table class="table games"></table>
+      </div>       
+    </div>
+  </div>
 </div>
 {% endblock %}

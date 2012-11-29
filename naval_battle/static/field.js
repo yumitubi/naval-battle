@@ -30,6 +30,7 @@ field.drawtable = function (nameblock){
     	    $('#'+i+nameblock).append($(str_td).attr('id', '' + i + m + field.po));
 	    $('#'+i+m+field.po).css('border', 'solid 1px');
 	    $('#'+i+m+field.po).css('width', '35px');
+	    $('#'+i+m+field.po).css('background-color', 'white');
 	    $('#'+i+m+field.po).attr('mark', '0');
     	}
     }
@@ -42,29 +43,34 @@ field.setclick = function (){
 	for(var m=0; m<10; m++){
 	    $('#'+i+m+field.po).click(
 		function (){
-		    if( $(this).attr('mark') == '0' ){
-			if( field.addcell($(this).attr('id')) && field.numcell<=20 ){
-			    $(this).attr('mark', '2');	
-			    $(this).css('background-color', 'red');
+		    if(field.user == 'build'){
+			if( $(this).attr('mark') == '0' ){
+			    if( field.addcell($(this).attr('id')) && field.numcell<=20 ){
+				$(this).attr('mark', '2');	
+				$(this).css('background-color', 'red');
 				field.field[$(this).attr('id')[0] + $(this).attr('id')[1]] = '2';
-			    if(field.checkship()){
-				field.push();
-			    } else {
-				$(this).attr('mark', '0');	
-				$(this).css('background-color', 'white');
-				field.field[$(this).attr('id')[0] + $(this).attr('id')[1]] = '0';
-			    }
-			} 
-		    } else {
-			$(this).css('background-color', 'white');
-			$(this).attr('mark', '0');
-			field.field[$(this).attr('id')] = '0';
+				if(field.checkship()){
+				    field.push();
+				} else {
+				    $(this).attr('mark', '0');	
+				    $(this).css('background-color', 'white');
+				    field.field[$(this).attr('id')[0] + $(this).attr('id')[1]] = '0';
+				}
+			    } 
+			} else {
+			    $(this).css('background-color', 'white');
+			    $(this).attr('mark', '0');
+			    field.field[$(this).attr('id')] = '0';
+			    field.checkmaximum();
+			    field.push();
+			}
+			field.checkship();
 			field.checkmaximum();
-			field.push();
+		    } else {
+			alert('Больше нельзя расставлять корабли!');
+			window.location.href = "/battle/";
 		    }
-		    field.checkship();
-		    field.checkmaximum();
-		    }
+		}
 	    );	    
 	}
     }
@@ -106,6 +112,11 @@ field.clickshot = function (){
 				           $('#'+data['coordinata']+'notyou').css('background-color', 'black');
 					   field.user = 'go';
 					   $('#status_go').text('Ваш ход!');
+					   break;
+				           case '4':
+				           $('#'+data['coordinata']+'notyou').css('background-color', 'black');
+					   field.user = 'win';
+					   $('#status_go').text('Тысяча чертей, Вы победили!');
 				           break;
 				       }
 
@@ -169,9 +180,11 @@ field.get = function (){
 		       });
 	    } else if(data['status'] == '1'){
 		field.field = data["field"];
+		field.user = 'build';
 	    } else if(data['status'] == '2'){
 	    	field.field = data["field"];
 		field.update_field();
+		field.user = 'in game';
 	    } else if(data['status'] == '3'){
 	    	field.field = data["field"];
 		field.user = 'go';
@@ -187,11 +200,15 @@ field.get = function (){
 		field.user = 'win';
 		$('#status_go').text('Тысяча чертей, Вы победили!');
 		field.update_field();
+		alert("Тысяча чертей, Вы победили");
+		window.location.href = "/move_game/";
 	    } else if(data['status'] == '6'){
 	    	field.field = data["field"];
 		field.user = 'lose';
 		$('#status_go').text('Вы проиграли!');
 		field.update_field();
+		alert("Вы прогирали =(");
+		window.location.href = "/move_game/";
 	    } else {
 		alert('Игра прервана');
 		window.location.href = "/";

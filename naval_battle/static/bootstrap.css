@@ -163,7 +163,8 @@ body {
   font-size: 14px;
   line-height: 20px;
   color: #333333;
-  background-color: #ffffff;
+  /* background-color: #ffffff; */
+  background: #fff url(/static/images/fonimage.png) no-repeat center top; 
 }
 
 a {

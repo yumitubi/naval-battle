@@ -39,16 +39,24 @@ function LoadMainPage(){
 // Argments ////////////////////////////////
 // `data` - json from server
 function UpdateMainPage(data){
-    $('#list_gamers').text('');
-    $('#list_gamers').append('<h3>Ждут игры:</h3>');
-    $('#list_gamers').append('<table></table>');
-    $('table').attr('class', 'table');
     if( data['user_status'] == '1'){
 	window.location.href = "/configure/";
     } else {
+	// update list users
+	$('#list_players').text('');
+	$('#list_players').append('<h3>Ждут игры:</h3>');
+	$('#list_players').append('<table></table>');
 	$.each(data['users'], function(key, val){
-		   $('.table').append('<tr id="users_wait"><td width="180px">' + val + '</td><td id="' + key + '"><input class="btn" type="button" name="game" value="Играть!"></td></tr>');
+		   $('.table players').append('<tr id="users_wait"><td width="180px">' + val + '</td><td id="' + key + '"><input class="btn" type="button" name="game" value="Играть!"></td></tr>');
 		   $('#'+key).children('input').click(Configure);
+	       });
+	// update list games
+	$('#list_games').text('');
+	$('#list_games').append('<h3>Сейчас играют:</h3>');
+	$('#list_games').append('<table></table>');
+	$.each(data['users'], function(key, val){
+		   $('.table games').append('<tr id="games_go"><td width="400px">' + val[0] + ' vs ' + val[1] + '</td><td id="'+ key + '"><input class="btn" type="button" name="watch" value="Смотреть!"></td></tr>');
+		   // $('#'+key).children('input').click(Configure);
 	       });
     }
 }

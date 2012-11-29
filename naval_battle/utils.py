@@ -2,7 +2,6 @@
 
 from models import Fields, Users, Games
 from utils2 import get_around_cells
-import pdb
 
 #------------------------------------------------------------
 # get database section
@@ -30,7 +29,7 @@ def get_begin_games():
     games = {}
     for user in users:
         id_game = str(user.game)
-        if games.haskey(id_game):
+        if games.has_key(id_game):
             games[id_game].append(user.user_name)
         else:
             games[id_game] = [user.user_name]
@@ -118,6 +117,7 @@ def get_value_coordinata(session_id, coordinata):
                 for cell in cells:
                     if coordict[cell] == "1" or coordict[cell] == "0":
                         graycells.append(cell)
+                # REFACTOR IT!
                 # top cells
                 # and yes, I know about range(x)!
                 for i in [1, 2, 3]:
@@ -190,6 +190,20 @@ def get_value_coordinata(session_id, coordinata):
                 coordict[coordinata] = u"3"
                 field.snapshot = coordict
             field.save();
+
+            # check that were kill all cells
+            kill_cells = 0
+            for key in coordict.keys():
+                if coordict[key] == "3":
+                    kill_cells += 1
+
+            if kill_cells >= 20:
+                user.status = 5
+                user.save()
+                other_user.status = 6
+                other_user.save()
+                # return u"4", means finish game
+                return u"4"
             # graycells return in function get_field_opponent(session_id)
             return coordict[coordinata]
 

@@ -1,6 +1,7 @@
 // configure battle.field
 
 function AllRun(){
+    field.user = 'build';
     field.drawtable('yourfield', 'test');
     field.get();
     field.setclick();
