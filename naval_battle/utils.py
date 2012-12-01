@@ -28,7 +28,8 @@ def get_begin_games():
     users = Users.objects(game__in=games_begin)
     games = {}
     for user in users:
-        id_game = str(user.game)
+        game = user.game
+        id_game = str(game.id)
         if games.has_key(id_game):
             games[id_game].append(user.user_name)
         else:
@@ -340,6 +341,9 @@ def update_user(**kwargs):
                     if u.session != user.session and u.status == 4:
                         u.status = 3
                         u.save()
+                        game = u.game
+                        game.status = 1
+                        game.save()
             user.status = kwargs['status']
         user.save()
         return user.user_name

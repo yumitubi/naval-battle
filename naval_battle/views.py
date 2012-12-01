@@ -192,6 +192,7 @@ def move_battle():
                              'status': 4 }
             update_user(**new_data_user)
             return jsonify(result=1)
+
 @app.route("/check_shot/", methods=['GET', 'POST'])            
 def check_shot():
     """check a shot and return result of shot
