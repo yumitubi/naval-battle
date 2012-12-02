@@ -1,4 +1,6 @@
 // add new user for wait second player
+var user_in_db = false;
+
 function AddNewUser(){
     var username = $("input:text").val();
     $.ajax({
@@ -12,7 +14,11 @@ function AddNewUser(){
 		var str = '<tr id="users_wait"><td width="180px">' + data['username']+ '</td><td id="' + data['user_id'] + '"><input class="btn" type="button" name="game" value="Играть!" onclick="Configure()/></div></td></tr>';
 		$('.table').append(str);
 		$('#'+data['user_id']).children().click(Configure);
-	    }
+	    } else if(data['new_user']==0){
+		alert('Вы уже создали сервер!');
+	    } else if(data['new_user']==2){
+		alert('Вы уже в игре!');
+	    } 
 	}
     });
     return false;
@@ -42,6 +48,11 @@ function UpdateMainPage(data){
     if( data['user_status'] == '1'){
 	window.location.href = "/configure/";
     } else {
+	if( data['current_user'] == "0"){
+	    user_in_db = "0";
+	} else {
+	    user_in_db = data['current_user'];
+	}
 	// update list users
 	$('#list_players').text('');
 	$('#list_players').append('<h3>Ждут игры:</h3>');
@@ -63,18 +74,21 @@ function UpdateMainPage(data){
 
 // add second player in games
 function Configure(){
-    
-    $.ajax({
-    	       url: '/add_second_user/',
-    	       type: 'post',
-    	       dataType: 'json',
-    	       data: ({"user_id":$(this).parent().attr('id'), 
-		       "username":prompt('Представьтесь, пожалуйста!')}),
-    	       success: function (data){
-		   window.location.href = "/configure/";
-	       }
-
-    	   });
+    if(user_in_db == "0"){
+	user_in_db = prompt('Представьтесь, пожалуйста!');
+    }
+    if( user_in_db ){
+	$.ajax({
+    		   url: '/add_second_user/',
+    		   type: 'post',
+    		   dataType: 'json',
+    		   data: ({"user_id":$(this).parent().attr('id'), 
+			   "username":user_in_db}),
+    		   success: function (data){
+		       window.location.href = "/configure/";
+		   }
+    	       });
+    } 
 }
 
 // get current coolies

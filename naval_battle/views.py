@@ -13,7 +13,7 @@ from naval_battle.utils2 import randstring
 from naval_battle.utils import add_user_in_db, add_new_game, get_wait_users \
 ,add_new_field, get_user_id, get_begin_games, get_field_dictionary, update_field \
 ,add_field_in_game, update_status_user, get_user_status, drop_user, update_user \
-,get_value_coordinata, get_field_opponent
+,get_value_coordinata, get_field_opponent, get_user_by_session
 
 @app.route("/", methods=['GET', 'POST'])
 def main_page():
@@ -46,19 +46,37 @@ def add_new_user():
     """
     if request.method == 'POST':
         username = request.form.values()[0].encode('utf8')
+        # check session
         if request.cookies.has_key('session_id'):
             cookie_session = request.cookies.get('session_id')
         else:
             cookie_session = randstring()
-        field = add_new_field()
-        game = add_new_game(field)
-        if add_user_in_db(cookie_session, username, game, field):
-            return jsonify(username=username,
-                           user_id=get_user_id(cookie_session),
-                           user_status=0, 
-                           new_user=1)
+        user = get_user_by_session(cookie_session)
+        # if user exist
+        if user:
+            # if already have a server
+            if user.status == 0:
+                return jsonify(new_user=0)
+            # if game was finished
+            if user.status == 5 or user.status == 6 or user.status == 7:
+                field = add_new_field()
+                game = add_new_game(field)
+                if add_user_in_db(cookie_session, username, game, field):
+                    return jsonify(username=username,
+                                   user_id=get_user_id(cookie_session),
+                                   user_status=0, 
+                                   new_user=1)
+            # if in game play now
+            if user.status == 3 or user.status == 4:
+                return jsonify(new_user=2)
         else:
-            return jsonify(new_user=0)
+            field = add_new_field()
+            game = add_new_game(field)
+            if add_user_in_db(cookie_session, username, game, field):
+                return jsonify(username=username,
+                               user_id=get_user_id(cookie_session),
+                               user_status=0, 
+                               new_user=1)
 
 @app.route("/add_second_user/", methods=['GET', 'POST'])
 def add_second_user():
@@ -67,7 +85,6 @@ def add_second_user():
     if request.method == 'POST': 
         wait_user = request.form['user_id'].encode('utf8')
         username = request.form['username'].encode('utf8')
-        # TODO: make add user, if he is not in database
         if request.cookies.has_key('session_id'):
             cookie_session = request.cookies.get('session_id')
         # TODO: this is bottleneck
@@ -98,17 +115,22 @@ def update_data_main_page():
                  'id':[user1, user2]}}
     """
     if request.method == 'POST':
+        current_user = "0"
         if request.cookies.has_key('session_id'):
             cookie_session = request.cookies.get('session_id')
             user_status = get_user_status(cookie_session)
             if user_status == 1:
                 return jsonify(user_status=user_status)
+            if user_status == 0:
+                user = get_user_by_session(cookie_session)
+                if user:
+                    current_user = user.user_name
         users = get_wait_users()
         list_username = {}
         for user in users:
             list_username[str(user.id)] = user.user_name
         games = get_begin_games()
-        return jsonify(users=list_username, games=games)
+        return jsonify(users=list_username, games=games, current_user=current_user)
 
 @app.route("/configure/", methods=['GET', 'POST'])
 def configure():

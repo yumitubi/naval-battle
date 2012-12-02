@@ -101,7 +101,7 @@ def get_user_by_session(session_id):
     try:
         return Users.objects.get(session=session_id)
     except:
-        return None
+        return False
 
 def get_value_coordinata(session_id, coordinata):
     """ return value cell from database
