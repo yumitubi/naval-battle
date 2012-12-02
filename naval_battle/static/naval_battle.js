@@ -71,7 +71,6 @@ function Configure(){
     	       data: ({"user_id":$(this).parent().attr('id'), 
 		       "username":prompt('Представьтесь, пожалуйста!')}),
     	       success: function (data){
-		   alert(JSON.stringify(data));
 		   window.location.href = "/configure/";
 	       }
 

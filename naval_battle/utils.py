@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+import datetime
 from models import Fields, Users, Games
 from utils2 import get_around_cells
 
@@ -14,7 +15,24 @@ def get_fields():
 def get_wait_users():
     """return list of users who are waiting game
     """
-    return Users.objects(status=0)
+    users_wait = Users.objects(status=0)
+    for user in users_wait:
+        try:
+            field = Fields.objects.get(id=user.field_battle.id)
+        except:
+            field = Fields()
+            field.save()
+        try:
+            game = Games.objects.get(id=user.game.id)
+            game.fields = [field]
+            game.save()
+        except:
+            game = Games(fields=[field])
+            game.save()
+        user.field_battle = field
+        user.game = game
+        user.save()
+    return users_wait
 
 
 def get_begin_games():
@@ -59,7 +77,7 @@ def get_user_status(session_id):
         user = Users.objects.get(session=session_id)
         return user.status
     except:
-        return 0
+        return 7
 
 def get_field_dictionary(session_id):
     """ return the current snapshot field
@@ -203,6 +221,9 @@ def get_value_coordinata(session_id, coordinata):
                 user.save()
                 other_user.status = 6
                 other_user.save()
+                game.status = 2
+                game.time_end = datetime.datetime.now()
+                game.save()
                 # return u"4", means finish game
                 return u"4"
             # graycells return in function get_field_opponent(session_id)
@@ -230,7 +251,7 @@ def get_field_opponent(session_id):
 #------------------------------------------------------------
 # add and update database section
 #------------------------------------------------------------
-def add_user_in_db(session, user, game, field, status=0):
+def add_user_in_db(session_id, username, game, field, status=0):
     """create user in database for registration in game
     
     Arguments:
@@ -241,16 +262,26 @@ def add_user_in_db(session, user, game, field, status=0):
     - `status`: status of user on site
     """
     # check session_id in database
-    if not Users.objects(session=session):
-        new_user = Users(user_name=user, 
-                         session=session,
+    users = Users.objects(session=session_id) 
+    if not users:
+        new_user = Users(user_name=username, 
+                         session=session_id,
                          game=game,
                          field_battle=field,
                      status=status)
         new_user.save()
         return True
     else:
-        return False
+        try:
+            user = Users.objects.get(session=session_id)
+            user.game = game
+            user.user_name = username
+            user.field_battle = field
+            user.status = 0
+            user.save()
+            return True
+        except:
+            return False
 
 def add_new_field():
     """add new field in database
@@ -326,7 +357,10 @@ def update_user(**kwargs):
     - `*args`:
     """
     if  kwargs.has_key('session_id'):
-        user = Users.objects.get(session=kwargs['session_id'])
+        try:
+            user = Users.objects.get(session=kwargs['session_id'])
+        except:
+            return False
         if kwargs.has_key('game'):
             user.game = kwargs['game']
         if kwargs.has_key('field'):

@@ -169,7 +169,7 @@ field.get = function (){
 	dataType: 'json',
 	data: ({}),
         success: function (data){
-	    if(data['status'] == '0'){ // checking is the status  
+	    if(data['status'] == '7'){ // checking is the status  
 		$.ajax({
 			   url: '/reset_game/',
 			   type: 'post',
@@ -209,10 +209,10 @@ field.get = function (){
 		field.update_field();
 		alert("Вы прогирали =(");
 		window.location.href = "/move_game/";
-	    } else {
-		alert('Игра прервана');
-		window.location.href = "/";
-	    }
+	    }//  else {
+	    // 	alert('Игра прервана');
+	    // 	window.location.href = "/";
+	    // }
 	}
     });
     return false;
