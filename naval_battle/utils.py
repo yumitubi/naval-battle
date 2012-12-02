@@ -270,18 +270,14 @@ def add_user_in_db(session_id, username, game, field, status=0):
                          field_battle=field,
                      status=status)
         new_user.save()
-        return True
     else:
-        try:
-            user = Users.objects.get(session=session_id)
-            user.game = game
-            user.user_name = username
-            user.field_battle = field
-            user.status = 0
-            user.save()
-            return True
-        except:
-            return False
+        user = Users.objects.get(session=session_id)
+        user.game = game
+        user.user_name = username
+        user.field_battle = field
+        user.status = status
+        user.save()
+    return True
 
 def add_new_field():
     """add new field in database
@@ -401,7 +397,10 @@ def drop_user(session_id):
         game = user.game
         users = Users.objects(game=game)
         for u in users:
-            u.status = 0;
+            if u != user:
+                u.status = 7
+            else:
+                u.status = 0;
             u.save()
         user.delete()
         game.delete()

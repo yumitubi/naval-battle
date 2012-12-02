@@ -169,6 +169,7 @@ field.get = function (){
 	dataType: 'json',
 	data: ({}),
         success: function (data){
+	    // alert(JSON.stringify(data));
 	    if(data['status'] == '7'){ // checking is the status  
 		$.ajax({
 			   url: '/reset_game/',
