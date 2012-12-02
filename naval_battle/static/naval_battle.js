@@ -1,5 +1,5 @@
 // add new user for wait second player
-var user_in_db = false;
+var user_in_db = "0";
 
 function AddNewUser(){
     var username = $("input:text").val();
@@ -85,7 +85,11 @@ function Configure(){
     		   data: ({"user_id":$(this).parent().attr('id'), 
 			   "username":user_in_db}),
     		   success: function (data){
-		       window.location.href = "/configure/";
+		       if( data['result'] == "1" ){
+			   window.location.href = "/configure/";			   
+		       } else {
+			   alert('Вы не можете играть сами с собой!');
+		       }
 		   }
     	       });
     } 

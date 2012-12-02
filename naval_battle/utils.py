@@ -248,6 +248,50 @@ def get_field_opponent(session_id):
                     visible_snapshot[key] = val
             return visible_snapshot
 
+def get_opponent(session_id):
+    """ return opponent
+
+    Arguments:
+    - `session_id`:
+    """
+    user = Users.objects.get(session=session_id)
+    for u in Users.objects(game=user.game):
+        if str(u.session) != session_id:
+            return u
+
+def get_fiels_move_games(user_field_id, opponent_field_id):
+    """return two field for url /move_game/ 
+
+    Arguments:
+    - `game_id`: id game
+    """
+    try:
+        user_field = Fields.objects.get(id=user_field_id)
+        opponent_field = Fields.objects.get(id=opponent_field_id)
+        user = Users.objects.get(field_battle=user_field)
+    except:
+        return False, False
+    user_field_dict = {}
+    opponent_field_dict = {}
+    for i in range(10):
+        for m in range(10):
+            user_field_dict[str(i)+str(m)] = "0"
+    for i in range(10):
+        for m in range(10):
+            opponent_field_dict[str(i)+str(m)] = "0"
+    if user.game.status == 1:
+        for key, val in user_field.snapshot.iteritems():
+            if user_field.snapshot[key] == "1" or user_field.snapshot[key] == "3":
+                user_field_dict[key] = user_field.snapshot[key]
+        for key, val in opponent_field.snapshot.iteritems():
+            if opponent_field.snapshot[key] == "1" or opponent_field.snapshot[key] == "3":
+                opponent_field_dict[key] = opponent_field.snapshot[key]
+        return user_field_dict, opponent_field_dict
+    if user.game.status == 2:
+        return user_field.snapshot, opponent_field.snapshot
+    return False, False
+    
+
 #------------------------------------------------------------
 # add and update database section
 #------------------------------------------------------------

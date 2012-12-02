@@ -3,13 +3,14 @@
 function AllRun(){
     field.drawtable('yourfield');
     field.po = 'notyou';
+    field.getnamesplayers();
     field.drawtable('opponentfield');    
     field.get_field_two();
     field.get();
     field.po = 'you';
     field.get();
     field.clickshot();
-    setInterval(field.get, 5000);
+    setInterval(field.get, 3000);
     // setInterval(field.push, 3000);
 }
 

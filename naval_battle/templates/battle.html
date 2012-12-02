@@ -5,14 +5,32 @@
  <div class="row">
    <script type="text/javascript" src="/static/field.js"></script>
    <script type="text/javascript" src="/static/battle.js"></script>
-   <h3 id="status_go">Ожидайте соперника!</h3>
-   <div class="span6">
+   <div class="span12">
+     <br />
+     <div id="info">
+       <div id="status_go">Ожидайте соперника!</div>            
+     </div>
+     <br />
+     <br />
+   </div>
+   <div class="span5">
+     <div id="user"></div>
+     <br />
      <div class="yourfield">
      </div>
    </div>
-   <div class="span6">
+   <div class="span1"></div>
+   <div class="span5">
+     <div id="opponent"></div>
+     <br />
      <div class="opponentfield">
      </div>
+   </div>
+   <div class="span12">
+     <br />
+     <form method="POST" id="battons" action="">
+       <input class="btn-primary btn-large" id="all_cancel" type="button" name="i_lose" value="Не хочу играть!" onclick="allCancel()" />
+     </form>
    </div>
    </div>
  </div>

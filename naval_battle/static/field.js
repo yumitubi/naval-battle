@@ -222,7 +222,7 @@ field.get = function (){
 // get data from database and update opponents' field
 field.get_field_two = function (){
     $.ajax({
-        url: '/get_field_two/',
+        url: '/get_field_second/',
 	type: 'post',
 	dataType: 'json',
         success: function (data){
@@ -232,6 +232,56 @@ field.get_field_two = function (){
     });
     return false;
 };
+
+field.gettwofields = function (){
+    var id_game = $('.id_game').attr('id');
+    $.ajax({
+        url: '/get_fields/',
+	type: 'post',
+	dataType: 'json',
+	data: ({ "id_games": id_game }),       
+        success: function (data){
+	    field.field = data['user_field'];
+	    field.field_two = data['opponent_field'];
+	    for(var i=0; i<10; i++){
+		for(var m=0; m<10; m++){
+		    if(field.field[''+i+m]=='1'){
+			$('#'+i+m+field.po).css('background-color', 'gray');
+		    }
+		    if(field.field[''+i+m]=='2'){
+			$('#'+i+m+field.po).css('background-color', 'red');
+		    }
+		    if(field.field[''+i+m]=='3'){
+			$('#'+i+m+field.po).css('background-color', 'black');
+		    }
+		}
+	    }
+	    field.po = 'notyou';
+	    for(var i=0; i<10; i++){
+		for(var m=0; m<10; m++){
+		    if(field.field_two[''+i+m]=='1'){
+			$('#'+i+m+field.po).css('background-color', 'gray');
+		    }
+		    if(field.field_two[''+i+m]=='2'){
+			$('#'+i+m+field.po).css('background-color', 'red');
+		    }
+		    if(field.field_two[''+i+m]=='3'){
+			$('#'+i+m+field.po).css('background-color', 'black');
+		    }
+		}
+	    }
+	    field.po = 'you';
+	    $('#user').text(data['username']);
+	    $('#user').css('text-align', 'center');
+	    $('#user').css('font-size', '1.8em');
+	    $('#opponent').text(data['opponentname']);
+	    $('#opponent').css('text-align', 'center');
+	    $('#opponent').css('font-size', '1.8em');
+	}
+    });
+    return false;
+}
+
 
 // the method push a data on server
 field.push = function (){
@@ -378,7 +428,7 @@ field.checkmaximum = function (){
 	    }
 	}
     }
-    $('.numcell').text(field.numcell);
+    $('.numcell').text('Количество юнитов: ' + field.numcell);
     return field.numcell;
 };
 
@@ -436,9 +486,12 @@ field.checkship = function (){
 	    }
 	}
     }
-    for(var i=0; i<5; i++){
-	$('.' + i).text(field.ships[''+i]);
+    // show info about ships
+    $('.' + '1').text('1 парус:  ' + field.ships[''+1]);
+    for(var i=2; i<5; i++){
+	$('.' + i).text(i + ' паруса: ' + field.ships[''+i]);	
     }
+    
     if( field.ships['1']<5 &&
 	field.ships['2']<4 &&
         field.ships['3']<3 &&
@@ -447,6 +500,27 @@ field.checkship = function (){
 	}
     return false;
 };
+
+// get names of players 
+field.getnamesplayers = function (){
+    $.ajax({
+	url: '/get_names_players/',
+	type: 'post',
+	dataType: 'json',
+        success: function (data){
+	    $('#user').text(data['username']);
+	    $('#user').css('text-align', 'center');
+	    $('#user').css('font-size', '1.8em');
+	    $('#opponent').text(data['opponent']);
+	    $('#opponent').css('text-align', 'center');
+	    $('#opponent').css('font-size', '1.8em');
+	    $('#info').css('text-align', 'center');
+	    $('#info').css('font-size', '2em');
+	    
+	}
+	   });
+};
+
 
 // batton ready for battle
 function allReady(){

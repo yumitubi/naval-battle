@@ -13,7 +13,8 @@ from naval_battle.utils2 import randstring
 from naval_battle.utils import add_user_in_db, add_new_game, get_wait_users \
 ,add_new_field, get_user_id, get_begin_games, get_field_dictionary, update_field \
 ,add_field_in_game, update_status_user, get_user_status, drop_user, update_user \
-,get_value_coordinata, get_field_opponent, get_user_by_session
+,get_value_coordinata, get_field_opponent, get_user_by_session, get_opponent \
+, get_fiels_move_games
 
 @app.route("/", methods=['GET', 'POST'])
 def main_page():
@@ -89,15 +90,15 @@ def add_second_user():
             cookie_session = request.cookies.get('session_id')
         # TODO: this is bottleneck
         # add exception here!
+        current_user = get_user_by_session(cookie_session)
+        if current_user and str(current_user.id) == wait_user:
+            return jsonify(result="0")
         field = add_new_field()
         game = add_field_in_game(wait_user, field)
         add_user = add_user_in_db(cookie_session, username, game, field, status=1)
         update_status = update_status_user(wait_user, 1)
         if add_user and update_status:
-            return jsonify(username=username,
-                           user_id=get_user_id(cookie_session),
-                           user_status=1,
-                           new_user=1)
+            return jsonify(result="1")
             
 
 @app.route("/update_data_for_main_page/", methods=['GET', 'POST'])
@@ -165,6 +166,18 @@ def get_state_field():
             else:
                 return jsonify(result='0')
 
+@app.route("/get_names_players/", methods=['GET', 'POST'])
+def get_names_players():
+    """get names user and his opponent
+    """
+    if request.method == 'POST':
+        if request.cookies.has_key('session_id'):
+            cookie_session = request.cookies.get('session_id')
+            username = get_user_by_session(cookie_session)
+            opponent = get_opponent(cookie_session)
+            return jsonify(username=username.user_name,
+                           opponent=opponent.user_name)
+
 @app.route("/all_cancel/", methods=['GET', 'POST'])
 def all_cancel():
     """reset all data for current game by user
@@ -229,8 +242,8 @@ def check_shot():
                            coordinata=coordinata,
                            field_opponent=field_opponent)
 
-@app.route("/get_field_two/", methods=['GET', 'POST'])            
-def get_field_two():
+@app.route("/get_field_second/", methods=['GET', 'POST'])            
+def get_field_second():
     """return field by opponent
     """
     if request.method == 'POST':
@@ -238,13 +251,34 @@ def get_field_two():
             cookie_session = request.cookies.get('session_id')
             field_opponent = get_field_opponent(cookie_session)    
             return jsonify(field_opponent=field_opponent)
+
+@app.route("/get_fields/", methods=['GET', 'POST'])            
+def get_fields():
+    """return fields of two plaing users
+    """
+    if request.method == 'POST':
+        if request.cookies.has_key('session_id'):
+            cookie_session = request.cookies.get('session_id')
+            user = get_user_by_session(cookie_session);
+            opponent = get_opponent(cookie_session)
+            user_field_id = str(user.field_battle.id)
+            opponent_field_id = str(opponent.field_battle.id)
+            user_field, opponent_field = get_fiels_move_games(user_field_id, opponent_field_id)
+            if user_field and opponent_field:
+                return jsonify(user_field=user_field, 
+                               opponent_field=opponent_field,
+                               username = user.user_name, 
+                               opponentname = opponent.user_name)
+        else:
+            pass
         
-@app.route("/move_game/")
+@app.route("/move_game/", methods=['GET', 'POST'])
 def move_game():
     """page for watch game
     """
     current_page = u'Ход игры'
-    response = make_response(render_template('move_game.html', current_page=current_page))
+    response = make_response(render_template('move_game.html', 
+                                             current_page=current_page))
     return response
 
 @app.route("/archive/")
