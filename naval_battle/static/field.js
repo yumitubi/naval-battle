@@ -233,54 +233,70 @@ field.get_field_two = function (){
     return false;
 };
 
+// get data about two fields for /move_games/
 field.gettwofields = function (){
     var id_game = $('.id_game').attr('id');
     $.ajax({
         url: '/get_fields/',
 	type: 'post',
 	dataType: 'json',
-	data: ({ "id_games": id_game }),       
+	data: ({ "id_game": id_game }),       
         success: function (data){
-	    field.field = data['user_field'];
-	    field.field_two = data['opponent_field'];
-	    for(var i=0; i<10; i++){
-		for(var m=0; m<10; m++){
-		    if(field.field[''+i+m]=='1'){
-			$('#'+i+m+field.po).css('background-color', 'gray');
-		    }
-		    if(field.field[''+i+m]=='2'){
-			$('#'+i+m+field.po).css('background-color', 'red');
-		    }
-		    if(field.field[''+i+m]=='3'){
-			$('#'+i+m+field.po).css('background-color', 'black');
+	    $('#info').css('text-align', 'center');
+	    $('#info').css('font-size', '2em');
+	    if(data['result'] == "0"){
+		window.location.href = "/";
+	    } else {
+		if(data['game_status'] == "3"){
+		    $('#info').text('Игроки готовятся!');
+		} else if(data['game_status'] == "1"){
+		    $('#info').text('Битва в разгаре!');
+		} else if(data['game_status'] == "2"){
+		    $('#info').text('Битва в завершена!');
+		} else {
+		    $('#info').text('Состояние не определено');
+		}
+		field.field = data['user_field'];
+		field.field_two = data['opponent_field'];
+		for(var i=0; i<10; i++){
+		    for(var m=0; m<10; m++){
+			if(field.field[''+i+m]=='1'){
+			    $('#'+i+m+field.po).css('background-color', 'gray');
+			}
+			if(field.field[''+i+m]=='2'){
+			    $('#'+i+m+field.po).css('background-color', 'red');
+			}
+			if(field.field[''+i+m]=='3'){
+			    $('#'+i+m+field.po).css('background-color', 'black');
+			}
 		    }
 		}
-	    }
-	    field.po = 'notyou';
-	    for(var i=0; i<10; i++){
-		for(var m=0; m<10; m++){
-		    if(field.field_two[''+i+m]=='1'){
-			$('#'+i+m+field.po).css('background-color', 'gray');
-		    }
-		    if(field.field_two[''+i+m]=='2'){
-			$('#'+i+m+field.po).css('background-color', 'red');
-		    }
-		    if(field.field_two[''+i+m]=='3'){
-			$('#'+i+m+field.po).css('background-color', 'black');
+		field.po = 'notyou';
+		for(var i=0; i<10; i++){
+		    for(var m=0; m<10; m++){
+			if(field.field_two[''+i+m]=='1'){
+			    $('#'+i+m+field.po).css('background-color', 'gray');
+			}
+			if(field.field_two[''+i+m]=='2'){
+			    $('#'+i+m+field.po).css('background-color', 'red');
+			}
+			if(field.field_two[''+i+m]=='3'){
+			    $('#'+i+m+field.po).css('background-color', 'black');
+			}
 		    }
 		}
+		field.po = 'you';
+		$('#user').text(data['username']);
+		$('#user').css('text-align', 'center');
+		$('#user').css('font-size', '1.8em');
+		$('#opponent').text(data['opponentname']);
+		$('#opponent').css('text-align', 'center');
+		$('#opponent').css('font-size', '1.8em');
 	    }
-	    field.po = 'you';
-	    $('#user').text(data['username']);
-	    $('#user').css('text-align', 'center');
-	    $('#user').css('font-size', '1.8em');
-	    $('#opponent').text(data['opponentname']);
-	    $('#opponent').css('text-align', 'center');
-	    $('#opponent').css('font-size', '1.8em');
 	}
     });
     return false;
-}
+};
 
 
 // the method push a data on server

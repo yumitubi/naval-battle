@@ -26,6 +26,7 @@ class Games(db.Document):
                 `0` - game wait
                 `1` - game begin
                 `2` - game end
+                `3` - game conf
     """
     fields = db.ListField(db.ReferenceField(Fields, dbref=True))
     time_begin = db.DateTimeField(default=datetime.datetime.now, required=True)

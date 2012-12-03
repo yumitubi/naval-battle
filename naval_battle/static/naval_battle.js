@@ -66,8 +66,8 @@ function UpdateMainPage(data){
 	$('#list_games').append('<h3>Сейчас играют:</h3>');
 	$('#list_games').append('<table id="table_games"></table>');
 	$.each(data['games'], function(key, val){
-		   $('#table_games').append('<tr id="games_go"><td width="400px">' + val[0] + ' vs ' + val[1] + '</td><td id="'+ key + '"><input class="btn" type="button" name="watch" value="Смотреть!"></td></tr>');
-		   // $('#'+key).children('input').click(Configure);
+		   $('#table_games').append('<tr id="games_go"><td width="400px">' + val[0] + ' vs ' + val[1] + '</td><td id="'+ key + '"><input id="' + key + '"class="btn" type="button" name="watch" value="Смотреть бой!"></td></tr>');
+		   $('#'+key).children('input').click(goMoveBattle);
 	       });
     }
 }
@@ -117,6 +117,12 @@ function getCookie(name) {
     }
     return(setStr);
 }
+
+// go to page /go_move_battle/<id>/ with id
+function goMoveBattle(){
+    window.location.href = '/go_move_battle/' + $(this).attr('id') + '/';
+};
+
 
 // draw information about gamers and games
 $(document).ready(LoadMainPage);

@@ -3,6 +3,7 @@
 import datetime
 from models import Fields, Users, Games
 from utils2 import get_around_cells
+from mongoengine.queryset import Q
 
 #------------------------------------------------------------
 # get database section
@@ -42,7 +43,7 @@ def get_begin_games():
     { 'id_game':['user1', 'user2'],
       'id_game':['user1', 'user2']}
     """
-    games_begin = Games.objects(status=1)
+    games_begin = Games.objects(Q(status=1) | Q(status=3))
     users = Users.objects(game__in=games_begin)
     games = {}
     for user in users:
@@ -259,8 +260,9 @@ def get_opponent(session_id):
         if str(u.session) != session_id:
             return u
 
-def get_fiels_move_games(user_field_id, opponent_field_id):
+def get_fields_move_games(user_field_id, opponent_field_id):
     """return two field for url /move_game/ 
+    TODO: write description for current algoritm
 
     Arguments:
     - `game_id`: id game
@@ -279,7 +281,7 @@ def get_fiels_move_games(user_field_id, opponent_field_id):
     for i in range(10):
         for m in range(10):
             opponent_field_dict[str(i)+str(m)] = "0"
-    if user.game.status == 1:
+    if user.game.status == 1 or user.game.status == 3:
         for key, val in user_field.snapshot.iteritems():
             if user_field.snapshot[key] == "1" or user_field.snapshot[key] == "3":
                 user_field_dict[key] = user_field.snapshot[key]
@@ -290,7 +292,28 @@ def get_fiels_move_games(user_field_id, opponent_field_id):
     if user.game.status == 2:
         return user_field.snapshot, opponent_field.snapshot
     return False, False
+
+def get_session_by_game(id_game):
+    """return session_id user by game
     
+    Arguments:
+    - `id_game`: id game in database, id in mongodb
+    """
+    try:
+        game = Games.objects.get(id=id_game)
+        user = Users.objects(game=game)[0]
+        return str(user.session)
+    except:
+        return False
+
+def get_session_by_user_id(user_id):
+    """return session user
+    
+    Arguments:
+    - `user_id`: user.id in mongodb
+    """
+    user = Users.objects.get(id=user_id)
+    return str(user.session)
 
 #------------------------------------------------------------
 # add and update database section
@@ -375,6 +398,7 @@ def update_field(session_id, field_dict):
         print 'проверить utils.update_field'
         return False
 
+# TODO: check unuse and delet this function
 def update_status_user(user_id, status):
     """ make update the status of user
     
@@ -394,7 +418,7 @@ def update_user(**kwargs):
     """ update data for current user
     
     Arguments:
-    - `*args`:
+    - `*kwargs`:
     """
     if  kwargs.has_key('session_id'):
         try:
@@ -418,6 +442,9 @@ def update_user(**kwargs):
                         game = u.game
                         game.status = 1
                         game.save()
+            if kwargs['status'] == 1:
+                game = user.game
+                game.status = 3
             user.status = kwargs['status']
         user.save()
         return user.user_name

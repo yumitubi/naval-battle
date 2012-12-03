@@ -12,9 +12,9 @@ from naval_battle.utils2 import randstring
 # 'from naval_battle.utils import *'
 from naval_battle.utils import add_user_in_db, add_new_game, get_wait_users \
 ,add_new_field, get_user_id, get_begin_games, get_field_dictionary, update_field \
-,add_field_in_game, update_status_user, get_user_status, drop_user, update_user \
+,add_field_in_game, get_user_status, drop_user, update_user \
 ,get_value_coordinata, get_field_opponent, get_user_by_session, get_opponent \
-, get_fiels_move_games
+,get_fields_move_games, get_session_by_game, get_session_by_user_id
 
 @app.route("/", methods=['GET', 'POST'])
 def main_page():
@@ -96,7 +96,10 @@ def add_second_user():
         field = add_new_field()
         game = add_field_in_game(wait_user, field)
         add_user = add_user_in_db(cookie_session, username, game, field, status=1)
-        update_status = update_status_user(wait_user, 1)
+        session_wait_user = get_session_by_user_id(wait_user)
+        new_data_user = { 'session_id' : session_wait_user,
+                          'status': 1 }
+        update_status = update_user(**new_data_user)
         if add_user and update_status:
             return jsonify(result="1")
             
@@ -228,6 +231,19 @@ def move_battle():
             update_user(**new_data_user)
             return jsonify(result=1)
 
+@app.route("/go_move_battle/<id_game>/", methods=['GET'])            
+def go_move_battle(id_game):
+    """move to battle
+    """
+    current_page = u'Ход игры'
+    response = make_response(render_template('move_game.html', 
+                                             current_page=current_page,
+                                             id_game=id_game))
+    return response
+
+    
+
+
 @app.route("/check_shot/", methods=['GET', 'POST'])            
 def check_shot():
     """check a shot and return result of shot
@@ -256,21 +272,47 @@ def get_field_second():
 def get_fields():
     """return fields of two plaing users
     """
+    
+    def return_data_field(cookie_session):
+        """response for request
+        
+        Arguments:
+        - `cookie_session`: session of user
+        """
+        user = get_user_by_session(cookie_session)
+        opponent = get_opponent(cookie_session)
+        user_field_id = str(user.field_battle.id)
+        opponent_field_id = str(opponent.field_battle.id)
+        user_field, opponent_field = get_fields_move_games(user_field_id, opponent_field_id)
+        game_status = user.game.status
+        # TODO: add data and time
+        if user_field and opponent_field:
+            return jsonify(user_field=user_field, 
+                           opponent_field=opponent_field,
+                           username=user.user_name, 
+                           opponentname=opponent.user_name,
+                           game_status=game_status,
+                           result="1")
+        return False
+    
+    # return result
     if request.method == 'POST':
-        if request.cookies.has_key('session_id'):
-            cookie_session = request.cookies.get('session_id')
-            user = get_user_by_session(cookie_session);
-            opponent = get_opponent(cookie_session)
-            user_field_id = str(user.field_battle.id)
-            opponent_field_id = str(opponent.field_battle.id)
-            user_field, opponent_field = get_fiels_move_games(user_field_id, opponent_field_id)
-            if user_field and opponent_field:
-                return jsonify(user_field=user_field, 
-                               opponent_field=opponent_field,
-                               username = user.user_name, 
-                               opponentname = opponent.user_name)
+        if request.form['id_game'].encode('utf8'):
+            cookie_session = get_session_by_game(request.form['id_game'].encode('utf8'))
+            result = return_data_field(cookie_session)
+            if result: 
+                return result
+            return jsonify(result="0")
         else:
-            pass
+            if request.cookies.has_key('session_id'):
+                cookie_session = request.cookies.get('session_id')
+                result = return_data_field(cookie_session)
+                if result:
+                    return result
+                return jsonify(result="0")
+            return jsonify(result="0")
+        return jsonify(result="0")
+
         
 @app.route("/move_game/", methods=['GET', 'POST'])
 def move_game():
