@@ -292,6 +292,10 @@ field.gettwofields = function (){
 		$('#opponent').text(data['opponentname']);
 		$('#opponent').css('text-align', 'center');
 		$('#opponent').css('font-size', '1.8em');
+
+		// date and time
+		$('#begin_game').text('Битва началась в: ' + data['time_begin']);
+		$('#duration_game').text('Длительность игры: ' + data['game_duration']);
 	    }
 	}
     });

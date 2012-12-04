@@ -14,7 +14,7 @@ from naval_battle.utils import add_user_in_db, add_new_game, get_wait_users \
 ,add_new_field, get_user_id, get_begin_games, get_field_dictionary, update_field \
 ,add_field_in_game, get_user_status, drop_user, update_user \
 ,get_value_coordinata, get_field_opponent, get_user_by_session, get_opponent \
-,get_fields_move_games, get_session_by_game, get_session_by_user_id
+,get_fields_move_games, get_session_by_game, get_session_by_user_id, get_time_begin
 
 @app.route("/", methods=['GET', 'POST'])
 def main_page():
@@ -279,12 +279,28 @@ def get_fields():
         Arguments:
         - `cookie_session`: session of user
         """
+        
+        months = { '01': 'января',
+                   '02': 'февраля',
+                   '03': 'марта',
+                   '04': 'апреля',
+                   '05': 'мая',
+                   '06': 'июня',
+                   '07': 'июля',
+                   '08': 'августа',
+                   '09': 'сентября',
+                   '10': 'октября',
+                   '11': 'ноября',
+                   '12': 'декабря'
+            }
+        
         user = get_user_by_session(cookie_session)
         opponent = get_opponent(cookie_session)
         user_field_id = str(user.field_battle.id)
         opponent_field_id = str(opponent.field_battle.id)
         user_field, opponent_field = get_fields_move_games(user_field_id, opponent_field_id)
         game_status = user.game.status
+        time_begin, game_duration = get_time_begin(cookie_session)
         # TODO: add data and time
         if user_field and opponent_field:
             return jsonify(user_field=user_field, 
@@ -292,6 +308,8 @@ def get_fields():
                            username=user.user_name, 
                            opponentname=opponent.user_name,
                            game_status=game_status,
+                           time_begin=time_begin.strftime('%H:%M %d ') + months[time_begin.strftime('%m')]+ time_begin.strftime(' %Y') + 'г.',
+                           game_duration = game_duration,
                            result="1")
         return False
     

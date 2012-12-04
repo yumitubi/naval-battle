@@ -247,6 +247,9 @@ def get_field_opponent(session_id):
                     visible_snapshot[key] = u"0"
                 else:
                     visible_snapshot[key] = val
+            game = u.game
+            game.time_end = datetime.datetime.now()
+            game.save()
             return visible_snapshot
 
 def get_opponent(session_id):
@@ -315,6 +318,18 @@ def get_session_by_user_id(user_id):
     user = Users.objects.get(id=user_id)
     return str(user.session)
 
+def get_time_begin(session_id):
+    """return time of begin game
+    
+    Arguments:
+    - `session_id`: session
+    """
+    user = Users.objects.get(session=session_id)
+    game = user.game
+    diff = game.time_end - game.time_begin
+    minutes, seconds = divmod(diff.total_seconds(), 60)
+    return game.time_begin, str(minutes) + ' минут ' + str(seconds) + ' секунд'
+
 #------------------------------------------------------------
 # add and update database section
 #------------------------------------------------------------
@@ -344,6 +359,9 @@ def add_user_in_db(session_id, username, game, field, status=0):
         user.field_battle = field
         user.status = status
         user.save()
+        game.time_begin = datetime.datetime.now()
+        game.time_end = datetime.datetime.now()
+        game.save()
     return True
 
 def add_new_field():
