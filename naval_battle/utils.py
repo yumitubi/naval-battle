@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import datetime
-from models import Fields, Users, Games
+from models import Fields, Users, Games, Logs
 from utils2 import get_around_cells
 from mongoengine.queryset import Q
 
@@ -117,6 +117,7 @@ def get_value_coordinata(session_id, coordinata):
     user = Users.objects.get(session = session_id)
     game = user.game
     for field in game.fields:
+        # find opponent
         if user.field_battle != field:
             coordict = field.snapshot
             other_user = Users.objects.get(field_battle=field)
@@ -209,6 +210,23 @@ def get_value_coordinata(session_id, coordinata):
                         coordict[i] = u"1"
                 coordict[coordinata] = u"3"
                 field.snapshot = coordict
+
+            # TODO: return the gray and black cells if a game go now
+            # add the note in Logs collections       
+            if user.status_first == 1:
+                add_to_log(game, 
+                           user.field_battle.snapshot, 
+                           user.user_name, 
+                           other_user.field_battle.snapshot,
+                           other_user.user_name)
+            # replace user and his opponent
+            if user.status_first == 2:
+                add_to_log(game, 
+                           other_user.field_battle.snapshot,
+                           other_user.user_name,
+                           user.field_battle.snapshot, 
+                           user.user_name)
+
             field.save();
 
             # check that were kill all cells
@@ -333,7 +351,7 @@ def get_time_begin(session_id):
 #------------------------------------------------------------
 # add and update database section
 #------------------------------------------------------------
-def add_user_in_db(session_id, username, game, field, status=0):
+def add_user_in_db(session_id, username, game, field, status=0, status_first=1):
     """create user in database for registration in game
     
     Arguments:
@@ -350,7 +368,8 @@ def add_user_in_db(session_id, username, game, field, status=0):
                          session=session_id,
                          game=game,
                          field_battle=field,
-                     status=status)
+                         status=status,
+                         status_first=status_first)
         new_user.save()
     else:
         user = Users.objects.get(session=session_id)
@@ -358,6 +377,7 @@ def add_user_in_db(session_id, username, game, field, status=0):
         user.user_name = username
         user.field_battle = field
         user.status = status
+        user.status_first = status_first
         user.save()
         game.time_begin = datetime.datetime.now()
         game.time_end = datetime.datetime.now()
@@ -392,6 +412,22 @@ def add_field_in_game(user_id, field):
     game.fields.append(field)
     game.save(cascade=True)
     return game
+
+def add_to_log(game, field, user, field_opponent, opponent):
+    """add note to collection Logs 
+    
+    Arguments:
+    - `game`:
+    - `field`:
+    - `user`:
+    """
+    note = Logs(game=game,
+                snapshot=field,
+                snapshot_opponent=field_opponent,
+                move_user=user,
+                opponent=opponent,
+                time=datetime.datetime.now())
+    note.save(cascade=True)
 
 def update_field(session_id, field_dict):
     """update data in field

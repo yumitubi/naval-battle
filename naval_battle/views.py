@@ -95,7 +95,7 @@ def add_second_user():
             return jsonify(result="0")
         field = add_new_field()
         game = add_field_in_game(wait_user, field)
-        add_user = add_user_in_db(cookie_session, username, game, field, status=1)
+        add_user = add_user_in_db(cookie_session, username, game, field, status=1, status_first=2)
         session_wait_user = get_session_by_user_id(wait_user)
         new_data_user = { 'session_id' : session_wait_user,
                           'status': 1 }
@@ -341,9 +341,13 @@ def move_game():
                                              current_page=current_page))
     return response
 
-@app.route("/archive/")
+@app.route("/archive/", methods=['GET', 'POST'])
 def archive():
     """page with results old games
     """
-    pass
+    current_page = u'Архив игр'
+    response = make_response(render_template('archive.html', 
+                                             current_page=current_page))
+    return response
+
 

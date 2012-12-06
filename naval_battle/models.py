@@ -58,29 +58,19 @@ class Users(db.Document):
     game = db.ReferenceField(Games, dbref=True)
     field_battle = db.ReferenceField(Fields, dbref=True)
     status = db.IntField()
+    status_first = db.IntField()
 
     def __unicode__(self):
         return str(self.user_name)
 
-class Ships(db.Document):
-    """model contain objects ship
-    and description his propertios
-    
-    - field `ship`: properties ship
-    - field `field`: foreign key to field
-    """
-    ship = db.DictField(default={}, required=True)
-    field = db.ReferenceField(Fields, dbref=True)
-
-    def __unicode__(self):
-        return str(self.ship)
-        
 class Logs(db.Document):
     """model contain info about all move of players
     """
     game = db.ReferenceField(Games, dbref=True)
     snapshot = db.DictField(default=gen_dict(), required=True)
-    move_user = db.ReferenceField(Users, dbref=True)
+    snapshot_opponent = db.DictField(default=gen_dict(), required=True)
+    move_user = db.StringField(max_length=255, required=True)
+    opponent = db.StringField(max_length=255, required=True)
     time = db.DateTimeField(default=datetime.datetime.now, required=True)
 
     def __unicode__(self):
