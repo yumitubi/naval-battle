@@ -14,8 +14,8 @@ from naval_battle.utils import add_user_in_db, add_new_game, get_wait_users \
 , add_new_field, get_user_id, get_begin_games, get_field_dictionary, update_field \
 , add_field_in_game, get_user_status, drop_user, update_user \
 , get_value_coordinata, get_field_opponent, get_user_by_session, get_opponent \
-, get_fields_move_games, get_session_by_game, get_session_by_user_id, get_time_begin \
-, get_list_archive_game
+, get_session_by_game, get_session_by_user_id, get_time_begin \
+, get_list_archive_game, get_info_battle
 
 @app.route("/", methods=['GET', 'POST'])
 def main_page():
@@ -274,7 +274,7 @@ def get_fields():
     """return fields of two plaing users
     """
     
-    def return_data_field(cookie_session):
+    def return_data_field(id_game):
         """response for request
         
         Arguments:
@@ -295,37 +295,33 @@ def get_fields():
                    '12': 'декабря'
             }
         
-        user = get_user_by_session(cookie_session)
-        opponent = get_opponent(cookie_session)
-        user_field_id = str(user.field_battle.id)
-        opponent_field_id = str(opponent.field_battle.id)
-        user_field, opponent_field = get_fields_move_games(user_field_id, opponent_field_id)
-        game_status = user.game.status
-        time_begin, game_duration = get_time_begin(cookie_session)
-        # TODO: add data and time
-        if user_field and opponent_field:
-            return jsonify(user_field=user_field, 
-                           opponent_field=opponent_field,
-                           username=user.user_name, 
-                           opponentname=opponent.user_name,
-                           game_status=game_status,
-                           time_begin=time_begin.strftime('%H:%M %d ') + months[time_begin.strftime('%m')]+ time_begin.strftime(' %Y') + 'г.',
-                           game_duration = game_duration,
+        info_battle = get_info_battle(id_game)
+        if info_battle:
+            return jsonify(user_field=info_battle['user_field'], 
+                           opponent_field=info_battle['opponent_field'],
+                           username=info_battle['username'], 
+                           opponentname=info_battle['opponentname'],
+                           game_status=info_battle['game_status'],
+                           time_begin=info_battle['time_begin'].strftime('%H:%M %d ') + months[info_battle['time_begin'].strftime('%m')]+ info_battle['time_begin'].strftime(' %Y') + 'г.',
+                           game_duration = get_time_begin(id_game),
                            result="1")
-        return False
+        else:
+            return False
     
     # return result
     if request.method == 'POST':
         if request.form['id_game'].encode('utf8'):
-            cookie_session = get_session_by_game(request.form['id_game'].encode('utf8'))
-            result = return_data_field(cookie_session)
+            id_game = request.form['id_game'].encode('utf8')
+            result = return_data_field(id_game)
             if result: 
                 return result
             return jsonify(result="0")
         else:
             if request.cookies.has_key('session_id'):
                 cookie_session = request.cookies.get('session_id')
-                result = return_data_field(cookie_session)
+                user = get_user_by_session(cookie_session)
+                id_game = str(user.game.id)
+                result = return_data_field(id_game)
                 if result:
                     return result
                 return jsonify(result="0")
@@ -357,5 +353,4 @@ def get_archive_game():
     """
     if request.method == 'POST':
         list_games = get_list_archive_game()
-        print list_games
         return jsonify(games=list_games)

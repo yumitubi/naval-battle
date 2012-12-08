@@ -211,6 +211,9 @@ def get_value_coordinata(session_id, coordinata):
                 coordict[coordinata] = u"3"
                 field.snapshot = coordict
 
+
+            field.save();
+
             # TODO: return the gray and black cells if a game go now
             # add the note in Logs collections       
             if user.status_first == 1:
@@ -226,8 +229,6 @@ def get_value_coordinata(session_id, coordinata):
                            other_user.user_name,
                            user.field_battle.snapshot, 
                            user.user_name)
-
-            field.save();
 
             # check that were kill all cells
             kill_cells = 0
@@ -281,38 +282,38 @@ def get_opponent(session_id):
         if str(u.session) != session_id:
             return u
 
-def get_fields_move_games(user_field_id, opponent_field_id):
-    """return two field for url /move_game/ 
-    TODO: write description for current algoritm
+# def get_fields_move_games(user_field_id, opponent_field_id):
+#     """return two field for url /move_game/ 
+#     TODO: write description for current algoritm
 
-    Arguments:
-    - `game_id`: id game
-    """
-    try:
-        user_field = Fields.objects.get(id=user_field_id)
-        opponent_field = Fields.objects.get(id=opponent_field_id)
-        user = Users.objects.get(field_battle=user_field)
-    except:
-        return False, False
-    user_field_dict = {}
-    opponent_field_dict = {}
-    for i in range(10):
-        for m in range(10):
-            user_field_dict[str(i)+str(m)] = "0"
-    for i in range(10):
-        for m in range(10):
-            opponent_field_dict[str(i)+str(m)] = "0"
-    if user.game.status == 1 or user.game.status == 3:
-        for key, val in user_field.snapshot.iteritems():
-            if user_field.snapshot[key] == "1" or user_field.snapshot[key] == "3":
-                user_field_dict[key] = user_field.snapshot[key]
-        for key, val in opponent_field.snapshot.iteritems():
-            if opponent_field.snapshot[key] == "1" or opponent_field.snapshot[key] == "3":
-                opponent_field_dict[key] = opponent_field.snapshot[key]
-        return user_field_dict, opponent_field_dict
-    if user.game.status == 2:
-        return user_field.snapshot, opponent_field.snapshot
-    return False, False
+#     Arguments:
+#     - `game_id`: id game
+#     """
+#     try:
+#         user_field = Fields.objects.get(id=user_field_id)
+#         opponent_field = Fields.objects.get(id=opponent_field_id)
+#         user = Users.objects.get(field_battle=user_field)
+#     except:
+#         return False, False
+#     user_field_dict = {}
+#     opponent_field_dict = {}
+#     for i in range(10):
+#         for m in range(10):
+#             user_field_dict[str(i)+str(m)] = "0"
+#     for i in range(10):
+#         for m in range(10):
+#             opponent_field_dict[str(i)+str(m)] = "0"
+#     if user.game.status == 1 or user.game.status == 3:
+#         for key, val in user_field.snapshot.iteritems():
+#             if user_field.snapshot[key] == "1" or user_field.snapshot[key] == "3":
+#                 user_field_dict[key] = user_field.snapshot[key]
+#         for key, val in opponent_field.snapshot.iteritems():
+#             if opponent_field.snapshot[key] == "1" or opponent_field.snapshot[key] == "3":
+#                 opponent_field_dict[key] = opponent_field.snapshot[key]
+#         return user_field_dict, opponent_field_dict
+#     if user.game.status == 2:
+#         return user_field.snapshot, opponent_field.snapshot
+#     return False, False
 
 def get_session_by_game(id_game):
     """return session_id user by game
@@ -336,17 +337,16 @@ def get_session_by_user_id(user_id):
     user = Users.objects.get(id=user_id)
     return str(user.session)
 
-def get_time_begin(session_id):
+def get_time_begin(id_game):
     """return time of begin game
     
     Arguments:
-    - `session_id`: session
+    - `id_game`: session
     """
-    user = Users.objects.get(session=session_id)
-    game = user.game
+    game = Games.objects.get(id=id_game)
     diff = game.time_end - game.time_begin
     minutes, seconds = divmod(diff.total_seconds(), 60)
-    return game.time_begin, str(minutes) + ' минут ' + str(seconds) + ' секунд'
+    return str(minutes) + ' минут ' + str(seconds) + ' секунд'
 
 def get_list_archive_game():
     """ returh list archive games
@@ -358,6 +358,51 @@ def get_list_archive_game():
         dict_game[str(note.game.id)] = { 'date' : note.game.time_begin.strftime('%d-%m-%Y'),
                                          'players': note.move_user + ' VS ' + note.opponent }
     return dict_game
+
+def get_info_battle(game_id):
+    """return dict:
+    
+    { 'user_field': field,
+      'opponent_field': field ,
+      'username': user_name ,
+      'opponentname': user_name ,
+      'game_status': status ,
+      'time_begin': time_begin }
+    
+    Arguments:
+    - `game_id`: id game
+    """
+    game = Games.objects.get(id=game_id)
+    try:
+        note = Logs.objects(game=game).order_by('-data')[0]
+    except: 
+        return False
+
+    user_field_dict = {}
+    opponent_field_dict = {}
+    for i in range(10):
+        for m in range(10):
+            user_field_dict[str(i)+str(m)] = "0"
+    for i in range(10):
+        for m in range(10):
+            opponent_field_dict[str(i)+str(m)] = "0"
+    if game.status == 1 or game.status == 3:
+        for key, val in note.snapshot.iteritems():
+            if note.snapshot[key] == "1" or note.snapshot[key] == "3":
+                user_field_dict[key] = note.snapshot[key]
+        for key, val in note.snapshot_opponent.iteritems():
+            if note.snapshot_opponent[key] == "1" or note.snapshot_opponent[key] == "3":
+                opponent_field_dict[key] = note.snapshot_opponent[key]
+    if game.status == 2:
+        user_field_dict = note.snapshot
+        opponent_field_dict = note.snapshot_opponent
+    info_battle = { 'user_field': user_field_dict,
+                    'opponent_field': opponent_field_dict,
+                    'username':  note.move_user,
+                    'opponentname': note.opponent,
+                    'game_status': note.game.status,
+                    'time_begin': note.time }
+    return info_battle
 
 #------------------------------------------------------------
 # add and update database section
