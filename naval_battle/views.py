@@ -14,7 +14,7 @@ from naval_battle.utils import add_user_in_db, add_new_game, get_wait_users \
 , add_new_field, get_user_id, get_begin_games, get_field_dictionary, update_field \
 , add_field_in_game, get_user_status, drop_user, update_user \
 , get_value_coordinata, get_field_opponent, get_user_by_session, get_opponent \
-, get_session_by_game, get_session_by_user_id, get_time_begin \
+, get_session_by_game, get_session_by_user_id, get_time_begin, get_game_status \
 , get_list_archive_game, get_info_battle
 
 @app.route("/", methods=['GET', 'POST'])
@@ -315,6 +315,10 @@ def get_fields():
             result = return_data_field(id_game)
             if result: 
                 return result
+            game_status = get_game_status(id_game)
+            if game_status == 3 or game_status == 1:
+                return jsonify(result="1",
+                               game_status=game_status)
             return jsonify(result="0")
         else:
             if request.cookies.has_key('session_id'):
@@ -324,6 +328,10 @@ def get_fields():
                 result = return_data_field(id_game)
                 if result:
                     return result
+                game_status = get_game_status(id_game)
+                if game_status == 3 or game_status == 1:
+                    return jsonify(result="1",
+                                   game_status=game_status)
                 return jsonify(result="0")
             return jsonify(result="0")
         return jsonify(result="0")
