@@ -70,6 +70,7 @@ class Logs(db.Document):
     snapshot = db.DictField(default=gen_dict(), required=True)
     snapshot_opponent = db.DictField(default=gen_dict(), required=True)
     move_user = db.StringField(max_length=255, required=True)
+    move_user_id = db.StringField(max_length=255, required=True)
     opponent = db.StringField(max_length=255, required=True)
     time = db.DateTimeField(default=datetime.datetime.now, required=True)
 

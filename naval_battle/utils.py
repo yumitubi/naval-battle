@@ -220,6 +220,7 @@ def get_value_coordinata(session_id, coordinata):
                 add_to_log(game, 
                            user.field_battle.snapshot, 
                            user.user_name, 
+                           str(user.id),
                            other_user.field_battle.snapshot,
                            other_user.user_name)
             # replace user and his opponent
@@ -227,6 +228,7 @@ def get_value_coordinata(session_id, coordinata):
                 add_to_log(game, 
                            other_user.field_battle.snapshot,
                            other_user.user_name,
+                           str(other_user.id),
                            user.field_battle.snapshot, 
                            user.user_name)
 
@@ -282,19 +284,6 @@ def get_opponent(session_id):
         if str(u.session) != session_id:
             return u
 
-def get_session_by_game(id_game):
-    """return session_id user by game
-    
-    Arguments:
-    - `id_game`: id game in database, id in mongodb
-    """
-    try:
-        game = Games.objects.get(id=id_game)
-        user = Users.objects(game=game)[0]
-        return str(user.session)
-    except:
-        return False
-
 def get_session_by_user_id(user_id):
     """return session user
     
@@ -341,7 +330,7 @@ def get_info_battle(game_id):
     """
     game = Games.objects.get(id=game_id)
     try:
-        note = Logs.objects(game=game).order_by('-data')[0]
+        note = Logs.objects(game=game).order_by('-time')[0]
     except: 
         return False
 
@@ -366,6 +355,7 @@ def get_info_battle(game_id):
     info_battle = { 'user_field': user_field_dict,
                     'opponent_field': opponent_field_dict,
                     'username':  note.move_user,
+                    'user_id': note.move_user_id,
                     'opponentname': note.opponent,
                     'game_status': note.game.status,
                     'time_begin': note.time }
@@ -445,7 +435,7 @@ def add_field_in_game(user_id, field):
     game.save(cascade=True)
     return game
 
-def add_to_log(game, field, user, field_opponent, opponent):
+def add_to_log(game, field, user, id_user, field_opponent, opponent):
     """add note to collection Logs 
     
     Arguments:
@@ -457,6 +447,7 @@ def add_to_log(game, field, user, field_opponent, opponent):
                 snapshot=field,
                 snapshot_opponent=field_opponent,
                 move_user=user,
+                move_user_id = id_user,
                 opponent=opponent,
                 time=datetime.datetime.now())
     note.save(cascade=True)
