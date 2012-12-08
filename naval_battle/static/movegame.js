@@ -6,7 +6,9 @@ function AllRun(){
     field.drawtable('opponentfield');
     field.po = 'you';
     field.gettwofields();
+    field.getlistmoves();
     setInterval(field.gettwofields, 5000);
+    setInterval(field.getlistmoves, 5000);
 }
 
 $(document).ready(AllRun);

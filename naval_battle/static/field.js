@@ -302,6 +302,30 @@ field.gettwofields = function (){
     return false;
 };
 
+// the method get list moves from database
+field.getlistmoves = function (){
+    var id_game = $('.id_game').attr('id');
+    $.ajax({
+        url: '/get_list_moves/',
+	type: 'post',
+	dataType: 'json',
+	data: ({ "id_game": id_game }),    
+        success: function(data){
+	    $('#list_shoot').text('');
+	    $.each( data['moves'], function (key, value){
+			$('#list_shoot').append('<tr><td id="' + key + '"> Ход №: ' + value + '</td></tr>');
+			$('#'+key).click(field.ShowMove);
+		    }
+		  );
+	}
+    });
+    return false;
+};
+
+// show move
+field.ShowMove = function (){
+    // pass
+};
 
 // the method push a data on server
 field.push = function (){

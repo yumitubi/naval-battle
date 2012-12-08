@@ -15,7 +15,7 @@ from naval_battle.utils import add_user_in_db, add_new_game, get_wait_users \
 , add_field_in_game, get_user_status, drop_user, update_user \
 , get_value_coordinata, get_field_opponent, get_user_by_session, get_opponent \
 , get_session_by_user_id, get_time_begin, get_game_status \
-, get_list_archive_game, get_info_battle
+, get_list_archive_game, get_info_battle, get_all_moves
 
 @app.route("/", methods=['GET', 'POST'])
 def main_page():
@@ -372,3 +372,13 @@ def get_archive_game():
     if request.method == 'POST':
         list_games = get_list_archive_game()
         return jsonify(games=list_games)
+
+
+@app.route("/get_list_moves/", methods=['GET', 'POST'])            
+def get_list_moves():
+    """return list moves
+    """
+    if request.method == 'POST':
+        if request.form['id_game'].encode('utf8'):
+            moves = get_all_moves(request.form['id_game'].encode('utf8'))
+            return jsonify(moves=moves)

@@ -370,6 +370,21 @@ def get_game_status(id_game):
     game = Games.objects.get(id=id_game)
     return game.status
 
+def get_all_moves(id_game):
+    """return list moves for game move
+    
+    Arguments:
+    - `id_game`: id game
+    """
+    game = Games.objects.get(id=id_game)
+    notes = Logs.objects(game=game).order_by('time')
+    moves = {}
+    count = 1
+    for note in notes:
+        moves[str(note.id)] = count
+        count += 1
+    return moves
+
 #------------------------------------------------------------
 # add and update database section
 #------------------------------------------------------------
