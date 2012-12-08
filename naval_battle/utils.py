@@ -348,6 +348,17 @@ def get_time_begin(session_id):
     minutes, seconds = divmod(diff.total_seconds(), 60)
     return game.time_begin, str(minutes) + ' минут ' + str(seconds) + ' секунд'
 
+def get_list_archive_game():
+    """ returh list archive games
+    """
+    games = Games.objects(status=2)
+    list_games = list(set(Logs.objects(game__in=games)))
+    dict_game = {}
+    for note in list_games:
+        dict_game[str(note.game.id)] = { 'date' : note.game.time_begin.strftime('%d-%m-%Y'),
+                                         'players': note.move_user + ' VS ' + note.opponent }
+    return dict_game
+
 #------------------------------------------------------------
 # add and update database section
 #------------------------------------------------------------

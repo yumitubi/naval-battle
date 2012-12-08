@@ -75,5 +75,9 @@ class Logs(db.Document):
 
     def __unicode__(self):
         return str(self.move_user)
+
+    meta = {
+        'ordering': ['-time']
+    }
         
 
