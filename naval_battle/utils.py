@@ -333,9 +333,17 @@ def get_info_battle(game_id):
         note = Logs.objects(game=game).order_by('-time')[0]
     except: 
         return False
+    return get_info(note)
 
+def get_info(note):
+    """return data about moves
+    
+    Arguments:
+    - `note`:
+    """
     user_field_dict = {}
     opponent_field_dict = {}
+    game = Games.objects.get(id=str(note.game.id))
     for i in range(10):
         for m in range(10):
             user_field_dict[str(i)+str(m)] = "0"
@@ -358,8 +366,9 @@ def get_info_battle(game_id):
                     'user_id': note.move_user_id,
                     'opponentname': note.opponent,
                     'game_status': note.game.status,
-                    'time_begin': note.time }
-    return info_battle
+                    'time_begin': note.time,
+                    'game_duration': get_time_begin(str(game.id))}
+    return info_battle    
 
 def get_game_status(id_game):
     """return game status
@@ -381,9 +390,18 @@ def get_all_moves(id_game):
     moves = {}
     count = 1
     for note in notes:
-        moves[str(note.id)] = count
+        moves[count] = str(note.id)
         count += 1
     return moves
+
+def get_move(id_move):
+    """return fields snapshot for current user
+    
+    Arguments:
+    - `id_move`: id move
+    """
+    return get_info(Logs.objects.get(id=id_move))
+
 
 #------------------------------------------------------------
 # add and update database section

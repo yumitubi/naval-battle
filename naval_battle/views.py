@@ -12,9 +12,9 @@ from naval_battle.utils2 import randstring
 # 'from naval_battle.utils import *'
 from naval_battle.utils import add_user_in_db, add_new_game, get_wait_users \
 , add_new_field, get_user_id, get_begin_games, get_field_dictionary, update_field \
-, add_field_in_game, get_user_status, drop_user, update_user \
+, add_field_in_game, get_user_status, drop_user, update_user, get_move \
 , get_value_coordinata, get_field_opponent, get_user_by_session, get_opponent \
-, get_session_by_user_id, get_time_begin, get_game_status \
+, get_session_by_user_id, get_game_status \
 , get_list_archive_game, get_info_battle, get_all_moves
 
 @app.route("/", methods=['GET', 'POST'])
@@ -273,59 +273,14 @@ def get_field_second():
 def get_fields():
     """return fields of two plaing users
     """
-    
-    def return_data_field(id_game, user_id=0):
-        """response for request
-        
-        Arguments:
-        - `cookie_session`: session of user
-        """
-        
-        months = { '01': 'января',
-                   '02': 'февраля',
-                   '03': 'марта',
-                   '04': 'апреля',
-                   '05': 'мая',
-                   '06': 'июня',
-                   '07': 'июля',
-                   '08': 'августа',
-                   '09': 'сентября',
-                   '10': 'октября',
-                   '11': 'ноября',
-                   '12': 'декабря'
-            }
-        
-        info_battle = get_info_battle(id_game)
-        if info_battle:
-            if info_battle['user_id'] == user_id:
-                return jsonify(user_field=info_battle['user_field'], 
-                               opponent_field=info_battle['opponent_field'],
-                               username=info_battle['username'], 
-                               opponentname=info_battle['opponentname'],
-                               game_status=info_battle['game_status'],
-                               time_begin=info_battle['time_begin'].strftime('%H:%M %d ') + months[info_battle['time_begin'].strftime('%m')]+ info_battle['time_begin'].strftime(' %Y') + 'г.',
-                               game_duration = get_time_begin(id_game),
-                               result="1")
-            else:
-                return jsonify(user_field=info_battle['opponent_field'], 
-                               opponent_field=info_battle['user_field'],
-                               username=info_battle['opponentname'], 
-                               opponentname=info_battle['username'],
-                               game_status=info_battle['game_status'],
-                               time_begin=info_battle['time_begin'].strftime('%H:%M %d ') + months[info_battle['time_begin'].strftime('%m')]+ info_battle['time_begin'].strftime(' %Y') + 'г.',
-                               game_duration = get_time_begin(id_game),
-                               result="1")
-        else:
-            return False
-    
     # return result
     if request.method == 'POST':
         if request.form['id_game'].encode('utf8'):
-            id_game = request.form['id_game'].encode('utf8')
-            result = return_data_field(id_game)
+            kwargs = { 'id_game': request.form['id_game'].encode('utf8')}
+            result = return_data_field(**kwargs)
             if result: 
                 return result
-            game_status = get_game_status(id_game)
+            game_status = get_game_status(request.form['id_game'].encode('utf8'))
             if game_status == 3 or game_status == 1:
                 return jsonify(result="1",
                                game_status=game_status)
@@ -334,11 +289,11 @@ def get_fields():
             if request.cookies.has_key('session_id'):
                 cookie_session = request.cookies.get('session_id')
                 user = get_user_by_session(cookie_session)
-                id_game = str(user.game.id)
-                result = return_data_field(id_game, str(user.id))
+                kwargs = { 'id_game': str(user.game.id)}
+                result = return_data_field(str(user.id), **kwargs )
                 if result:
                     return result
-                game_status = get_game_status(id_game)
+                game_status = get_game_status(kwargs['id_game'])
                 if game_status == 3 or game_status == 1:
                     return jsonify(result="1",
                                    game_status=game_status)
@@ -382,3 +337,68 @@ def get_list_moves():
         if request.form['id_game'].encode('utf8'):
             moves = get_all_moves(request.form['id_game'].encode('utf8'))
             return jsonify(moves=moves)
+
+@app.route("/get_fields_move/", methods=['GET', 'POST'])            
+def get_fields_move():
+    """return snapshot fields for current move
+    """
+    if request.method == 'POST':
+        if request.form['id_move'].encode('utf8'):
+            kwargs = { 'id_move': request.form['id_move'].encode('utf8')}
+            result = return_data_field(**kwargs)
+            if result: 
+                return result
+            # game_status = get_game_status(id_move)
+            # if game_status == 3 or game_status == 1:
+            #     return jsonify(result="1",
+            #                    game_status=game_status)
+            # return jsonify(result="0")
+        return jsonify(result="0")
+
+def return_data_field(user_id=0, **kwargs):
+    """response for request
+    
+    Arguments:
+    - `cookie_session`: session of user
+    """
+    
+    months = { '01': 'января',
+               '02': 'февраля',
+               '03': 'марта',
+               '04': 'апреля',
+               '05': 'мая',
+               '06': 'июня',
+               '07': 'июля',
+               '08': 'августа',
+               '09': 'сентября',
+               '10': 'октября',
+               '11': 'ноября',
+               '12': 'декабря'
+               }
+
+    info_battle = False
+    if kwargs.has_key('id_move'):
+        info_battle = get_move(kwargs['id_move'])
+    if kwargs.has_key('id_game'):
+        info_battle = get_info_battle(kwargs['id_game'])
+    if info_battle:
+        if info_battle['user_id'] == user_id:
+            return jsonify(user_field=info_battle['user_field'], 
+                           opponent_field=info_battle['opponent_field'],
+                           username=info_battle['username'], 
+                           opponentname=info_battle['opponentname'],
+                           game_status=info_battle['game_status'],
+                           time_begin=info_battle['time_begin'].strftime('%H:%M %d ') + months[info_battle['time_begin'].strftime('%m')]+ info_battle['time_begin'].strftime(' %Y') + 'г.',
+                           game_duration = info_battle['game_duration'],
+                           result="1")
+        else:
+            return jsonify(user_field=info_battle['opponent_field'], 
+                           opponent_field=info_battle['user_field'],
+                           username=info_battle['opponentname'], 
+                           opponentname=info_battle['username'],
+                           game_status=info_battle['game_status'],
+                           time_begin=info_battle['time_begin'].strftime('%H:%M %d ') + months[info_battle['time_begin'].strftime('%m')]+ info_battle['time_begin'].strftime(' %Y') + 'г.',
+                           game_duration = info_battle['game_duration'],
+                           result="1")
+    else:
+        return False

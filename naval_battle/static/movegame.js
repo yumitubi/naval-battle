@@ -7,7 +7,7 @@ function AllRun(){
     field.po = 'you';
     field.gettwofields();
     field.getlistmoves();
-    setInterval(field.gettwofields, 5000);
+    window.updatefields = setInterval(field.gettwofields, 5000);
     setInterval(field.getlistmoves, 5000);
 }
 

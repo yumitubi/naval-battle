@@ -241,64 +241,7 @@ field.gettwofields = function (){
 	type: 'post',
 	dataType: 'json',
 	data: ({ "id_game": id_game }),       
-        success: function (data){
-	    $('#info').css('text-align', 'center');
-	    $('#info').css('font-size', '2em');
-	    if(data['result'] == "0"){
-		window.location.href = "/";
-	    } else {
-		if(data['game_status'] == "3"){
-		    $('#info').text('Игроки готовятся!');
-		} else if(data['game_status'] == "1"){
-		    $('#info').text('Битва в разгаре!');
-		} else if(data['game_status'] == "2"){
-		    $('#info').text('Битва в завершена!');
-		} else {
-		    $('#info').text('Состояние не определено');
-		}
-		field.field = data['user_field'];
-		field.field_two = data['opponent_field'];
-		for(var i=0; i<10; i++){
-		    for(var m=0; m<10; m++){
-			if(field.field[''+i+m]=='1'){
-			    $('#'+i+m+field.po).css('background-color', 'gray');
-			}
-			if(field.field[''+i+m]=='2'){
-			    $('#'+i+m+field.po).css('background-color', 'red');
-			}
-			if(field.field[''+i+m]=='3'){
-			    $('#'+i+m+field.po).css('background-color', 'black');
-			}
-		    }
-		}
-		field.po = 'notyou';
-		for(var i=0; i<10; i++){
-		    for(var m=0; m<10; m++){
-			if(field.field_two[''+i+m]=='1'){
-			    $('#'+i+m+field.po).css('background-color', 'gray');
-			}
-			if(field.field_two[''+i+m]=='2'){
-			    $('#'+i+m+field.po).css('background-color', 'red');
-			}
-			if(field.field_two[''+i+m]=='3'){
-			    $('#'+i+m+field.po).css('background-color', 'black');
-			}
-		    }
-		}
-		field.po = 'you';
-		$('#user').text(data['username']);
-		$('#user').css('text-align', 'center');
-		$('#user').css('font-size', '1.8em');
-		$('#opponent').text(data['opponentname']);
-		$('#opponent').css('text-align', 'center');
-		$('#opponent').css('font-size', '1.8em');
-
-		// date and time
-		$('#begin_game').text('Битва началась в: ' + data['time_begin']);
-		$('#duration_game').text('Длительность игры: ' + data['game_duration']);
-	    }
-	}
-    });
+        success: field.update_game_move });
     return false;
 };
 
@@ -312,11 +255,12 @@ field.getlistmoves = function (){
 	data: ({ "id_game": id_game }),    
         success: function(data){
 	    $('#list_shoot').text('');
-	    $.each( data['moves'], function (key, value){
-			$('#list_shoot').append('<tr><td id="' + key + '"> Ход №: ' + value + '</td></tr>');
-			$('#'+key).click(field.ShowMove);
-		    }
-		  );
+	    var i = 1;
+	    while( data['moves']['' + i] != undefined ){
+		$('#list_shoot').append('<tr><td id="' + data['moves']['' + i] + '"> Ход №: ' + i + '</td></tr>');
+		$('#'+data['moves']['' + i]).click(field.ShowMove);
+		i++;
+	    }
 	}
     });
     return false;
@@ -324,7 +268,75 @@ field.getlistmoves = function (){
 
 // show move
 field.ShowMove = function (){
-    // pass
+    clearInterval(window.updatefields);
+    $.ajax({
+        url: '/get_fields_move/',
+	type: 'post',
+	dataType: 'json',
+	data: ({ "id_move": $(this).attr('id') }),    
+        success: field.update_game_move });
+    return false;
+};
+
+// update
+field.update_game_move = function (data){
+    field.drawtable('you');
+    $('#info').css('text-align', 'center');
+    $('#info').css('font-size', '2em');
+    if(data['result'] == "0"){
+	window.location.href = "/";
+    } else {
+	if(data['game_status'] == "3"){
+	    $('#info').text('Игроки готовятся!');
+	} else if(data['game_status'] == "1"){
+	    $('#info').text('Битва в разгаре!');
+	} else if(data['game_status'] == "2"){
+	    $('#info').text('Битва в завершена!');
+	} else {
+	    $('#info').text('Состояние не определено');
+	}
+	field.field = data['user_field'];
+	field.field_two = data['opponent_field'];
+	for(var i=0; i<10; i++){
+	    for(var m=0; m<10; m++){
+		if(field.field[''+i+m]=='1'){
+		    $('#'+i+m+field.po).css('background-color', 'gray');
+		}
+		if(field.field[''+i+m]=='2'){
+		    $('#'+i+m+field.po).css('background-color', 'red');
+		}
+		if(field.field[''+i+m]=='3'){
+		    $('#'+i+m+field.po).css('background-color', 'black');
+		}
+	    }
+	}
+	field.po = 'notyou';
+	field.drawtable('notyou');    
+	for(var i=0; i<10; i++){
+	    for(var m=0; m<10; m++){
+		if(field.field_two[''+i+m]=='1'){
+		    $('#'+i+m+field.po).css('background-color', 'gray');
+		}
+		if(field.field_two[''+i+m]=='2'){
+		    $('#'+i+m+field.po).css('background-color', 'red');
+		}
+		if(field.field_two[''+i+m]=='3'){
+		    $('#'+i+m+field.po).css('background-color', 'black');
+		}
+	    }
+	}
+	field.po = 'you';
+	$('#user').text(data['username']);
+	$('#user').css('text-align', 'center');
+	$('#user').css('font-size', '1.8em');
+	$('#opponent').text(data['opponentname']);
+	$('#opponent').css('text-align', 'center');
+	$('#opponent').css('font-size', '1.8em');
+	
+	// date and time
+	$('#begin_game').text('Битва началась в: ' + data['time_begin']);
+	$('#duration_game').text('Длительность игры: ' + data['game_duration']);
+    }
 };
 
 // the method push a data on server
