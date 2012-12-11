@@ -402,6 +402,17 @@ def get_move(id_move):
     """
     return get_info(Logs.objects.get(id=id_move))
 
+def get_game_by_session(session_id):
+    """return game
+    
+    Arguments:
+    - `session_id`:
+    """
+    try:
+        user = Users.objects.get(session=session_id)
+        return user.game
+    except:
+        return False
 
 #------------------------------------------------------------
 # add and update database section

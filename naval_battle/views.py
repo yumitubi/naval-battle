@@ -5,7 +5,7 @@
 
 import json
 
-from flask import render_template, request, make_response, jsonify
+from flask import render_template, request, make_response, jsonify, redirect
 from naval_battle import app
 from naval_battle.utils2 import randstring
 # TODO: after finish process develop replace on 
@@ -14,7 +14,7 @@ from naval_battle.utils import add_user_in_db, add_new_game, get_wait_users \
 , add_new_field, get_user_id, get_begin_games, get_field_dictionary, update_field \
 , add_field_in_game, get_user_status, drop_user, update_user, get_move \
 , get_value_coordinata, get_field_opponent, get_user_by_session, get_opponent \
-, get_session_by_user_id, get_game_status \
+, get_session_by_user_id, get_game_status, get_game_by_session \
 , get_list_archive_game, get_info_battle, get_all_moves
 
 @app.route("/", methods=['GET', 'POST'])
@@ -135,7 +135,11 @@ def update_data_main_page():
         for user in users:
             list_username[str(user.id)] = user.user_name
         games = get_begin_games()
-        return jsonify(users=list_username, games=games, current_user=current_user)
+        user_server = get_user_id(cookie_session)
+        return jsonify(users=list_username, 
+                       games=games, 
+                       current_user=current_user, 
+                       user_server=user_server)
 
 @app.route("/configure/", methods=['GET', 'POST'])
 def configure():
@@ -307,9 +311,18 @@ def move_game():
     """page for watch game
     """
     current_page = u'Ход игры'
-    response = make_response(render_template('move_game.html', 
-                                             current_page=current_page))
-    return response
+    if request.cookies.has_key('session_id'):
+        cookie_session = request.cookies['session_id'].encode('utf8')
+        if get_user_by_session(cookie_session) and get_game_by_session(cookie_session):
+            game = get_game_by_session(cookie_session)
+            response = make_response(render_template('move_game.html', 
+                                                     current_page=current_page,
+                                                     id_game=str(game.id)))
+            return response
+        else:
+            return redirect('/')
+    else:
+        return redirect('/')
 
 @app.route("/archive/", methods=['GET', 'POST'])
 def archive():

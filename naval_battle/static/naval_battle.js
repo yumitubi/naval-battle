@@ -69,6 +69,8 @@ function UpdateMainPage(data){
 		   $('#table_games').append('<tr id="games_go"><td width="400px">' + val[0] + ' vs ' + val[1] + '</td><td id="'+ key + '"><input id="' + key + '"class="btn" type="button" name="watch" value="Смотреть бой!"></td></tr>');
 		   $('#'+key).children('input').click(goMoveBattle);
 	       });
+	$('#' + data['user_server']).parent().css('background-color', 'white');
+	$('#' + data['user_server']).parent().attr('title', 'Это твой сервер!');
     }
 }
 
