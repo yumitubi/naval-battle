@@ -5,12 +5,12 @@
  <div class="row">
    <script type="text/javascript" src="/static/archive.js"></script>
    <script type="text/javascript" src="/static/jquery-ui.js"></script>
-   <div class="span7">
+   <div class="span6">
      <div class="header"><h3>Архив игр:</h3></div>
      <form method="POST" id="date" action="">
        <h4>Введите период:</h4><input type="text" name="firstdate" value="" class="span2" id="datepicker1" onkeypress="usl(event)"/>
        <input type="text" name="seconddate" value="" class="span2" id="datepicker2" onkeypress="usl(event)"/>
-       <input type="button" name="" value="Применить" class="btn-primary btn-large" onclick="getlistgames()"/>
+       &nbsp;&nbsp;<input type="button" name="" value="Применить" class="btn" onclick="getlistgames()"/>
      </form>
      <div><table id="list_games" class="table">
      </table></div>
