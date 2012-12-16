@@ -14,8 +14,8 @@ from naval_battle.utils import add_user_in_db, add_new_game, get_wait_users \
 , add_new_field, get_user_id, get_begin_games, get_field_dictionary, update_field \
 , add_field_in_game, get_user_status, drop_user, update_user, get_move \
 , get_value_coordinata, get_field_opponent, get_user_by_session, get_opponent \
-, get_session_by_user_id, get_game_status, get_game_by_session \
-, get_list_archive_game, get_info_battle, get_all_moves
+, get_session_by_user_id, get_game_status, get_game_by_session, get_watch_users \
+, get_list_archive_game, get_info_battle, get_all_moves, update_watch_users
 
 @app.route("/", methods=['GET', 'POST'])
 def main_page():
@@ -158,8 +158,10 @@ def send_state_field():
             cookie_session = request.cookies.get('session_id')
             field = get_field_dictionary(cookie_session)
             user_status = get_user_status(cookie_session)
+            number_watch_user = get_watch_users(cookie_session)
             return jsonify(field=field,
-                           status=user_status)
+                           status=user_status,
+                           number_watch_user=number_watch_user)
 
 @app.route("/get_state_field/", methods=['GET', 'POST'])
 def get_state_field():
@@ -352,6 +354,7 @@ def get_list_moves():
     if request.method == 'POST':
         if request.form['id_game'].encode('utf8'):
             moves = get_all_moves(request.form['id_game'].encode('utf8'))
+            update_watch_users(request.form['id_game'].encode('utf8'), request.cookies['session_id'].encode('utf8'))
             return jsonify(moves=moves)
 
 @app.route("/get_fields_move/", methods=['GET', 'POST'])            

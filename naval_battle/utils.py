@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import datetime
-from models import Fields, Users, Games, Logs
+from models import Fields, Users, Games, Logs, Watchusers
 from utils2 import get_around_cells
 from mongoengine.queryset import Q
 
@@ -458,6 +458,19 @@ def get_game_by_session(session_id):
     except:
         return False
 
+def get_watch_users(session_id):
+    """return number user which watch game
+    
+    Arguments:
+    - `session_id`: session_id
+    """
+    user = Users.objects.get(session=session_id)
+    game = user.game
+    now = datetime.datetime.now()
+    time_old = now + datetime.timedelta(minutes = -1)
+    print Watchusers.objects(game=game, time__gte=time_old).count()
+    return Watchusers.objects(game=game, time__gte=time_old).count()
+
 #------------------------------------------------------------
 # add and update database section
 #------------------------------------------------------------
@@ -616,6 +629,29 @@ def update_user(**kwargs):
     else:
         return False
         
+def update_watch_users(id_game, session_id):
+    """update information about users which watch game
+    
+    Arguments:
+    - `id_game`: id game
+    - `session_id`: session id
+    """
+    now = datetime.datetime.now()
+    time_old = now + datetime.timedelta(minutes = -1 )
+    try:
+        Watchusers.objects(time__lte=time_old).delete()
+    except:
+        pass
+    user = Users.objects.get(session=session_id)
+    game = Games.objects.get(id=id_game)
+    watch_user = Watchusers.objects(user=user, game=game)
+    if watch_user:
+        watch_user[0].time = now
+        watch_user[0].save()
+    else:
+        new_watch = Watchusers(user=user, game=game)
+        new_watch.save()
+    return True
 
 #------------------------------------------------------------
 # delete database section

@@ -82,3 +82,12 @@ class Logs(db.Document):
     }
         
 
+class Watchusers(db.Document):
+    """model contain users which watch games"""
+    user = db.ReferenceField(Users, dbref=True)
+    game = db.ReferenceField(Games, dbref=True)
+    time = db.DateTimeField(default=datetime.datetime.now, required=True)
+
+    def __unicode__(self):
+        return str(self.user)
+        

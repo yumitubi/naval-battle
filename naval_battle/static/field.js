@@ -170,7 +170,8 @@ field.get = function (){
 	data: ({}),
         success: function (data){
 	    // alert(JSON.stringify(data));
-	    if(data['status'] == '7'){ // checking is the status  
+	    if(data['status'] == '7'){ // checking is the status 
+		// if user broken
 		$.ajax({
 			   url: '/reset_game/',
 			   type: 'post',
@@ -180,23 +181,30 @@ field.get = function (){
 			   }
 		       });
 	    } else if(data['status'] == '1'){
+		// if user configure his field
 		field.field = data["field"];
 		field.user = 'build';
 	    } else if(data['status'] == '2'){
+		// ready to play
 	    	field.field = data["field"];
 		field.update_field();
 		field.user = 'in game';
 	    } else if(data['status'] == '3'){
+		// user move
 	    	field.field = data["field"];
 		field.user = 'go';
 		$('#status_go').text('Ваш ход!');
 		field.update_field();
+		$('.number_watcher').text('За игрой следят: ' + data['number_watch_user'] + ' человек.');
 	    } else if(data['status'] == '4'){
+		// user wait of move other gamer
 	    	field.field = data["field"];
 		field.user = 'wait';
 		$('#status_go').text('Ожидайте хода соперника!');
 		field.update_field();
+		$('.number_watcher').text('За игрой следят: ' + data['number_watch_user'] + ' человек.');
 	    } else if(data['status'] == '5'){
+		// user win!
 	    	field.field = data["field"];
 		field.user = 'win';
 		$('#status_go').text('Тысяча чертей, Вы победили!');
@@ -204,6 +212,7 @@ field.get = function (){
 		alert("Тысяча чертей, Вы победили");
 		window.location.href = "/move_game/";
 	    } else if(data['status'] == '6'){
+		// user lose!
 	    	field.field = data["field"];
 		field.user = 'lose';
 		$('#status_go').text('Вы проиграли!');
