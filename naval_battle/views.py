@@ -338,9 +338,12 @@ def get_archive_game():
     """response list of archive games
     """
     if request.method == 'POST':
-        list_games = get_list_archive_game()
-        return jsonify(games=list_games)
-
+        list_games = get_list_archive_game(request.form['firstdate'], request.form['seconddate'])
+        if list_games:
+            return jsonify(games=list_games,
+                           result="1")
+        else:
+            return jsonify(result="0")
 
 @app.route("/get_list_moves/", methods=['GET', 'POST'])            
 def get_list_moves():

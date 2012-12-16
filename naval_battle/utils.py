@@ -304,10 +304,52 @@ def get_time_begin(id_game):
     minutes, seconds = divmod(diff.total_seconds(), 60)
     return str(minutes) + ' минут ' + str(seconds) + ' секунд'
 
-def get_list_archive_game():
+def get_list_archive_game(firstdate, seconddate):
     """ returh list archive games
+
+    - `firstdate`: date from first field on archive.html
+    - `seconddate`: date from second field on archive.html
     """
-    games = Games.objects(status=2)
+    if firstdate == '' and seconddate == '':
+        games = Games.objects(status=2)
+    elif seconddate == '' or firstdate == '':
+        try:
+            if firstdate and len(firstdate) == 10:
+                year = int(firstdate[-4:])
+                month = int(firstdate[3:5])
+                day = int(firstdate[:2])
+                dt = datetime.datetime(year, month, day)
+                games = Games.objects(status=2, time_begin__gte=dt)
+            elif seconddate and len(seconddate) == 10:
+                year = int(seconddate[-4:])
+                month = int(seconddate[3:5])
+                day = int(seconddate[:2])
+                dt = datetime.datetime(year, month, day)
+                games = Games.objects(status=2, time_begin__gte=dt)
+            else:
+                return False
+        except: 
+            return False
+    else:
+        if len(firstdate) != 10 and len(seconddate) != 10:
+            return False
+        try:
+            year_f = int(firstdate[-4:])
+            month_f = int(firstdate[3:5])
+            day_f = int(firstdate[:2])
+            dt_first = datetime.datetime(year_f, month_f, day_f)
+            year_s = int(seconddate[-4:])
+            month_s = int(seconddate[3:5])
+            day_s = int(seconddate[:2])
+            dt_second = datetime.datetime(year_s, month_s, day_s)
+            if dt_first < dt_second:
+                dt_second = datetime.datetime(year_s, month_s, day_s, 23, 59, 59)
+                games = Games.objects( Q(status=2) & (Q(time_begin__gte=dt_first) & Q(time_begin__lte=dt_second)))
+            else:
+                dt_first = datetime.datetime(year_f, month_f, day_f, 23, 59, 59)
+                games = Games.objects( Q(status=2) & (Q(time_begin__lte=dt_first) & Q(time_begin__gte=dt_second)))
+        except:
+            return False
     list_games = list(set(Logs.objects(game__in=games)))
     dict_game = {}
     for note in list_games:
