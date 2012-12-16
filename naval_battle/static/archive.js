@@ -1,5 +1,12 @@
 // archive page
 
+function usl(e){
+    if(e.keyCode == 13){
+	getlistgames();
+    }
+    return false;
+}
+
 function getlistgames(){
     $.ajax({
 	       url: '/get_archive_game/',

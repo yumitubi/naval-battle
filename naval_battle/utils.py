@@ -351,11 +351,13 @@ def get_list_archive_game(firstdate, seconddate):
         except:
             return False
     list_games = list(set(Logs.objects(game__in=games)))
-    dict_game = {}
-    for note in list_games:
-        dict_game[str(note.game.id)] = { 'date' : note.game.time_begin.strftime('%d-%m-%Y'),
-                                         'players': note.move_user + ' VS ' + note.opponent }
-    return dict_game
+    if list_games:
+        dict_game = {}
+        for note in list_games:
+            dict_game[str(note.game.id)] = { 'date' : note.game.time_begin.strftime('%d-%m-%Y'),
+                                             'players': note.move_user + ' VS ' + note.opponent }
+        return dict_game
+    return True
 
 def get_info_battle(game_id):
     """return dict:

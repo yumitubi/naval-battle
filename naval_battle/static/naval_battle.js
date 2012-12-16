@@ -1,6 +1,13 @@
 // add new user for wait second player
 var user_in_db = "0";
 
+function usl(e){
+    if(e.keyCode == 13){
+	AddNewUser();
+    }
+    return false;
+}
+
 function AddNewUser(){
     var username = $("input:text").val();
     $.ajax({
