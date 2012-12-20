@@ -10,24 +10,29 @@ function usl(e){
 
 function AddNewUser(){
     var username = $("input:text").val();
-    $.ajax({
-	url: '/add_new_user/',
-	type: 'post',
-	dataType: 'json',
-	data: ({"username": username}),
-	success: function(data)
-	{
-	    if (data['new_user']==1){
-		var str = '<tr id="users_wait"><td width="180px">' + data['username']+ '</td><td id="' + data['user_id'] + '"><input class="btn" type="button" name="game" value="Играть!" onclick="Configure()/></div></td></tr>';
-		$('.table').append(str);
-		$('#'+data['user_id']).children().click(Configure);
-	    } else if(data['new_user']==0){
-		alert('Вы уже создали сервер!');
-	    } else if(data['new_user']==2){
-		alert('Вы уже в игре!');
-	    } 
-	}
-    });
+    if(username.length > 3){
+	$.ajax({
+		   url: '/add_new_user/',
+		   type: 'post',
+		   dataType: 'json',
+		   data: ({"username": username}),
+		   success: function(data)
+		   {
+		       if (data['new_user']==1){
+			   var str = '<tr id="users_wait"><td width="180px">' + data['username']+ '</td><td id="' + data['user_id'] + '"><input class="btn" type="button" name="game" value="Играть!" onclick="Configure()/></div></td></tr>';
+			   $('.table').append(str);
+			   $('#'+data['user_id']).children().click(Configure);
+		       } else if(data['new_user']==0){
+			   alert('Вы уже создали сервер!');
+		       } else if(data['new_user']==2){
+			   alert('Вы уже в игре!');
+		       } 
+		   }
+	       });
+	
+    } else {
+	alert('Слишком корроткое имя, попробуйте снова!');
+    }
     return false;
 }
 
