@@ -6,7 +6,7 @@
 settings.py
 .ropeproject/
 *.py[co]
-
+naval_battle/__init__.py
 # Packages
 *.egg
 *.egg-info
