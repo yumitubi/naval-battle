@@ -8,8 +8,6 @@ import json
 from flask import render_template, request, make_response, jsonify, redirect
 from naval_battle import app
 from naval_battle.utils2 import randstring
-# TODO: after finish process develop replace on 
-# 'from naval_battle.utils import *'
 from naval_battle.utils import add_user_in_db, add_new_game, get_wait_users \
 , add_new_field, get_user_id, get_begin_games, get_field_dictionary, update_field \
 , add_field_in_game, get_user_status, drop_user, update_user, get_move \
