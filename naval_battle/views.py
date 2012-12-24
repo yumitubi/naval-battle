@@ -54,6 +54,7 @@ def add_new_user():
         user = get_user_by_session(cookie_session)
         # if user exist
         if user:
+            update_user(**{'session_id': cookie_session, 'time': True })
             # if already have a server
             if user.status == 0:
                 return jsonify(new_user=0)
@@ -121,6 +122,7 @@ def update_data_main_page():
         current_user = "0"
         if request.cookies.has_key('session_id'):
             cookie_session = request.cookies.get('session_id')
+            update_user(**{ 'session_id': cookie_session, 'time': True })
             user_status = get_user_status(cookie_session)
             if user_status == 1:
                 return jsonify(user_status=user_status)
@@ -149,11 +151,12 @@ def configure():
 
 @app.route("/send_state_field/", methods=['GET', 'POST'])
 def send_state_field():
-    """return the current snapshot field
+    """return the current snapshot field from database
     """
     if request.method == 'POST':
         if request.cookies.has_key('session_id'):
             cookie_session = request.cookies.get('session_id')
+            update_user(**{ 'session_id': cookie_session, 'time': True })
             field = get_field_dictionary(cookie_session)
             user_status = get_user_status(cookie_session)
             number_watch_user = get_watch_users(cookie_session)
@@ -168,6 +171,7 @@ def get_state_field():
     if request.method == 'POST':
         if request.cookies.has_key('session_id'):
             cookie_session = request.cookies.get('session_id')
+            update_user(**{ 'session_id': cookie_session, 'time': True })
             field = json.loads(request.form.keys()[0])
             if update_field(cookie_session, field):
                 return jsonify(result='1')
@@ -208,7 +212,8 @@ def reset_game():
             new_data_user = { 'game': game,
                               'field': field,
                               'session_id': cookie_session,
-                              'status': 0}
+                              'status': 0,
+                              'time': True}
             username = update_user(**new_data_user)
             if username:
                 return jsonify(username=username,
@@ -232,7 +237,8 @@ def move_battle():
         if request.cookies.has_key('session_id'):
             cookie_session = request.cookies.get('session_id')
             new_data_user = {'session_id':cookie_session,
-                             'status': 4 }
+                             'status': 4,
+                             'time': True}
             update_user(**new_data_user)
             return jsonify(result=1)
 
@@ -256,6 +262,7 @@ def check_shot():
     if request.method == 'POST':
         if request.cookies.has_key('session_id'):
             cookie_session = request.cookies.get('session_id')
+            update_user(**{ 'session_id': cookie_session, 'time': True })
             coordinata = request.form['coordinata'].encode('utf8')
             result = get_value_coordinata(cookie_session, coordinata)
             field_opponent = get_field_opponent(cookie_session)
@@ -365,11 +372,6 @@ def get_fields_move():
             result = return_data_field(**kwargs)
             if result: 
                 return result
-            # game_status = get_game_status(id_move)
-            # if game_status == 3 or game_status == 1:
-            #     return jsonify(result="1",
-            #                    game_status=game_status)
-            # return jsonify(result="0")
         return jsonify(result="0")
 
 def return_data_field(user_id=0, **kwargs):

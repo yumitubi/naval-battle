@@ -16,7 +16,9 @@ def get_fields():
 def get_wait_users():
     """return list of users who are waiting game
     """
-    users_wait = Users.objects(status=0)
+    now = datetime.datetime.now()
+    time_old = now + datetime.timedelta(minutes = -2)
+    users_wait = Users.objects(status=0, last_time__gte=time_old)
     for user in users_wait:
         try:
             field = Fields.objects.get(id=user.field_battle.id)
@@ -76,7 +78,27 @@ def get_user_status(session_id):
     """
     try:
         user = Users.objects.get(session=session_id)
-        return user.status
+        opponent = get_opponent(session_id)
+        if opponent:
+            last_time = datetime.datetime.now() + datetime.timedelta(minutes = -2)
+            if opponent.last_time > last_time: 
+                return user.status
+            else:
+                drop_user(str(opponent.session))
+                field = add_new_field()
+                game = add_new_game(field)
+                new_data_user = { 'game': game,
+                                  'field': field,
+                                  'session_id': session_id,
+                                  'status': 0,
+                                  'time': True}
+                update_user(**new_data_user)
+                return 7
+        else:
+            new_data_user = { 'session_id': session_id,
+                              'time': True}
+            update_user(**new_data_user)
+            return user.status
     except:
         return 7
 
@@ -279,10 +301,13 @@ def get_opponent(session_id):
     Arguments:
     - `session_id`:
     """
-    user = Users.objects.get(session=session_id)
-    for u in Users.objects(game=user.game):
-        if str(u.session) != session_id:
-            return u
+    try:
+        user = Users.objects.get(session=session_id)
+        for u in Users.objects(game=user.game):
+            if str(u.session) != session_id:
+                return u
+    except:
+        return False
 
 def get_session_by_user_id(user_id):
     """return session user
@@ -468,7 +493,6 @@ def get_watch_users(session_id):
     game = user.game
     now = datetime.datetime.now()
     time_old = now + datetime.timedelta(minutes = -1)
-    print Watchusers.objects(game=game, time__gte=time_old).count()
     return Watchusers.objects(game=game, time__gte=time_old).count()
 
 #------------------------------------------------------------
@@ -596,7 +620,12 @@ def update_user(**kwargs):
     """ update data for current user
     
     Arguments:
-    - `*kwargs`:
+    - `*kwargs`: may be ---->
+                 { 'session_id': ...,
+                   'game': ...,
+                   'field': ...,
+                   'status': ...,
+                   'time': ...}
     """
     if  kwargs.has_key('session_id'):
         try:
@@ -624,6 +653,8 @@ def update_user(**kwargs):
                 game = user.game
                 game.status = 3
             user.status = kwargs['status']
+        if kwargs.has_key('time'):
+            user.last_time = datetime.datetime.now()
         user.save()
         return user.user_name
     else:

@@ -59,6 +59,7 @@ class Users(db.Document):
     field_battle = db.ReferenceField(Fields, dbref=True)
     status = db.IntField()
     status_first = db.IntField()
+    last_time = db.DateTimeField(default=datetime.datetime.now, required=True)
 
     def __unicode__(self):
         return str(self.user_name)
