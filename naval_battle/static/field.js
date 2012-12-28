@@ -99,23 +99,33 @@ field.clickshot = function (){
 				       switch(data['result']){
 		 		           case '0':
 				           $('#'+data['coordinata']+'notyou').css('background-color', 'gray');
+					   var audio = $("#splash")[0];
+					   audio.play();
 				           break;
 				           case '1':
 				           $('#'+data['coordinata']+'notyou').css('background-color', 'gray');
+					   var audio = $("#splash")[0];
+					   audio.play();
 				           break;
 				           case '2':
 				           $('#'+data['coordinata']+'notyou').css('background-color', 'black');
 					   field.user = 'go';
  					   $('#status_go').text('Ваш ход!');
+					   var audio = $("#boom")[0];
+					   audio.play();
 				           break;
 				           case '3':
 				           $('#'+data['coordinata']+'notyou').css('background-color', 'black');
 					   field.user = 'go';
 					   $('#status_go').text('Ваш ход!');
+					   var audio = $("#boom")[0];
+					   audio.play();
 					   break;
 				           case '4':
 				           $('#'+data['coordinata']+'notyou').css('background-color', 'black');
 					   field.user = 'win';
+					   var audio = $("#boom")[0];
+					   audio.play();
 					   $('#status_go').text('Тысяча чертей, Вы победили!');
 				           break;
 				       }
@@ -207,6 +217,8 @@ field.get = function (){
 		// user win!
 	    	field.field = data["field"];
 		field.user = 'win';
+		var audio = $("#victory")[0];
+		audio.play();
 		$('#status_go').text('Тысяча чертей, Вы победили!');
 		field.update_field();
 		alert("Тысяча чертей, Вы победили");
@@ -217,6 +229,8 @@ field.get = function (){
 		field.user = 'lose';
 		$('#status_go').text('Вы проиграли!');
 		field.update_field();
+		var audio = $("#blynk")[0];
+		audio.play();
 		alert("Вы прогирали =(");
 		window.location.href = "/move_game/";
 	    }//  else {
