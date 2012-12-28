@@ -332,6 +332,10 @@ def get_time_begin(id_game):
 def get_list_archive_game(firstdate, seconddate):
     """ returh list archive games
 
+    - return dictionary in format:
+              { 'date' : date,
+                'players': user VS user }
+
     - `firstdate`: date from first field on archive.html
     - `seconddate`: date from second field on archive.html
     """
@@ -375,10 +379,10 @@ def get_list_archive_game(firstdate, seconddate):
                 games = Games.objects( Q(status=2) & (Q(time_begin__lte=dt_first) & Q(time_begin__gte=dt_second)))
         except:
             return False
-    list_games = list(set(Logs.objects(game__in=games)))
-    if list_games:
+    if games:
         dict_game = {}
-        for note in list_games:
+        for game in games:
+            note = Logs.objects(game=game)[0]
             dict_game[str(note.game.id)] = { 'date' : note.game.time_begin.strftime('%d-%m-%Y'),
                                              'players': note.move_user + ' VS ' + note.opponent }
         return dict_game
