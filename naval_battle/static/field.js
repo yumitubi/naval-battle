@@ -142,16 +142,19 @@ field.clickshot = function (){
 
 // update view field from field.field
 field.update_field = function (){
+    field.numcell = 0
     for(var i=0; i<10; i++){
 	for(var m=0; m<10; m++){
 	    if(field.field[''+i+m]=='1'){
 		$('#'+i+m+field.po).css('background-color', 'gray');
+		field.numcell = field.numcell + 1;
 	    }
 	    if(field.field[''+i+m]=='2'){
 		$('#'+i+m+field.po).css('background-color', 'red');
 	    }
 	    if(field.field[''+i+m]=='3'){
 		$('#'+i+m+field.po).css('background-color', 'black');
+		field.numcell = field.numcell + 1;
 	    }
 	}
     }
@@ -204,14 +207,25 @@ field.get = function (){
 	    	field.field = data["field"];
 		field.user = 'go';
 		$('#status_go').text('Ваш ход!');
+		current_cells = field.numcell;
 		field.update_field();
+		if(current_cells<field.numcell){
+		    var audio = $("#splash")[0];
+		    audio.play();
+		}
 		$('.number_watcher').text('За игрой следят: ' + data['number_watch_user'] + ' человек.');
 	    } else if(data['status'] == '4'){
 		// user wait of move other gamer
 	    	field.field = data["field"];
 		field.user = 'wait';
 		$('#status_go').text('Ожидайте хода соперника!');
+		current_cells = field.numcell;
+		// alert(field.numcell);
 		field.update_field();
+		if(current_cells<field.numcell){
+		    var audio = $("#boom")[0];
+		    audio.play();
+		}
 		$('.number_watcher').text('За игрой следят: ' + data['number_watch_user'] + ' человек.');
 	    } else if(data['status'] == '5'){
 		// user win!
@@ -600,6 +614,10 @@ field.getnamesplayers = function (){
 	   });
 };
 
+// get number of mark cells
+field.getnumbermarkcells = function(){
+    
+}
 
 // batton ready for battle
 function allReady(){
