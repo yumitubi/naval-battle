@@ -231,7 +231,7 @@ field.get = function (){
 		field.update_field();
 		var audio = $("#blynk")[0];
 		audio.play();
-		alert("Вы прогирали =(");
+		alert("Вы проиграли =(");
 		window.location.href = "/move_game/";
 	    }//  else {
 	    // 	alert('Игра прервана');
