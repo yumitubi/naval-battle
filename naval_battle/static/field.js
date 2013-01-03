@@ -11,7 +11,8 @@ var field = {
 	'4': 0 },  
     numcell: 0,      // num cell on field
     po: 'you',
-    user: 'wait'
+    user: 'wait',
+    shot_enabled: 1
 };
 
 ///////////////////////////////////////////////
@@ -142,7 +143,7 @@ field.clickshot = function (){
 
 // update view field from field.field
 field.update_field = function (){
-    field.numcell = 0
+    field.numcell = 0;
     for(var i=0; i<10; i++){
 	for(var m=0; m<10; m++){
 	    if(field.field[''+i+m]=='1'){
@@ -209,11 +210,12 @@ field.get = function (){
 		$('#status_go').text('Ваш ход!');
 		current_cells = field.numcell;
 		field.update_field();
-		if(current_cells<field.numcell){
+		if(current_cells<field.numcell && field.shot_enabled == 2){
 		    var audio = $("#splash")[0];
 		    audio.play();
 		}
 		$('.number_watcher').text('За игрой следят: ' + data['number_watch_user'] + ' человек.');
+		field.shot_enabled = 2;
 	    } else if(data['status'] == '4'){
 		// user wait of move other gamer
 	    	field.field = data["field"];
@@ -222,11 +224,12 @@ field.get = function (){
 		current_cells = field.numcell;
 		// alert(field.numcell);
 		field.update_field();
-		if(current_cells<field.numcell){
+		if(current_cells<field.numcell && field.shot_enabled == 2){
 		    var audio = $("#boom")[0];
 		    audio.play();
 		}
 		$('.number_watcher').text('За игрой следят: ' + data['number_watch_user'] + ' человек.');
+		field.shot_enabled = 2;
 	    } else if(data['status'] == '5'){
 		// user win!
 	    	field.field = data["field"];
