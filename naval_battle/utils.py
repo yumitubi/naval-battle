@@ -700,7 +700,6 @@ def drop_user(session_id):
     """
     try:
         user = Users.objects.get(session=session_id)
-        field = user.field_battle
         game = user.game
         users = Users.objects(game=game)
         for u in users:
@@ -710,8 +709,6 @@ def drop_user(session_id):
                 u.status = 0;
             u.save()
         user.delete()
-        game.delete()
-        field.delete()
         return True
     except:
         return False
