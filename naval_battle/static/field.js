@@ -190,6 +190,10 @@ field.get = function (){
 			       window.location.href = "/";
 			   }
 		       });
+	    } else if(data['status'] == '8'){
+		// user not found in database
+		alert('Сначала создайте сервер на главное странице и дождитесь оппонента!');
+		window.location.href = "/";
 	    } else if(data['status'] == '1'){
 		// if user configure his field
 		field.field = data["field"];

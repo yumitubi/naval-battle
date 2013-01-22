@@ -100,7 +100,9 @@ def get_user_status(session_id):
             update_user(**new_data_user)
             return user.status
     except:
-        return 7
+        # if user not found database
+        # this use when user is new man on the site
+        return 8
 
 def get_field_dictionary(session_id):
     """ return the current snapshot field
@@ -279,7 +281,10 @@ def get_field_opponent(session_id):
     Arguments:
     - `session_id`:
     """
-    user = Users.objects.get(session=session_id)
+    try:
+        user = Users.objects.get(session=session_id)
+    except:
+        return False
     for u in Users.objects(game=user.game):
         if u.session != session_id:
             field = u.field_battle
@@ -493,7 +498,10 @@ def get_watch_users(session_id):
     Arguments:
     - `session_id`: session_id
     """
-    user = Users.objects.get(session=session_id)
+    try:
+        user = Users.objects.get(session=session_id)
+    except:
+        return 0
     game = user.game
     now = datetime.datetime.now()
     time_old = now + datetime.timedelta(minutes = -1)

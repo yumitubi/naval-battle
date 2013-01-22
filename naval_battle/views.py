@@ -180,15 +180,19 @@ def get_state_field():
 
 @app.route("/get_names_players/", methods=['GET', 'POST'])
 def get_names_players():
-    """get names user and his opponent
+    """get names of user and of his opponent
     """
     if request.method == 'POST':
         if request.cookies.has_key('session_id'):
             cookie_session = request.cookies.get('session_id')
             username = get_user_by_session(cookie_session)
             opponent = get_opponent(cookie_session)
-            return jsonify(username=username.user_name,
-                           opponent=opponent.user_name)
+            if username and opponent:
+                return jsonify(username=username.user_name,
+                               opponent=opponent.user_name)
+            else:
+                return jsonify(username="Нет данных",
+                               opponent="Нет данных")
 
 @app.route("/all_cancel/", methods=['GET', 'POST'])
 def all_cancel():
@@ -220,6 +224,10 @@ def reset_game():
                            user_id=get_user_id(cookie_session),
                            user_status=0, 
                            new_user=1)
+            else:
+                return redirect('/')
+        else:
+            return redirect('/')
 
 @app.route("/battle/", methods=['GET', 'POST'])            
 def battle():
@@ -278,7 +286,10 @@ def get_field_second():
         if request.cookies.has_key('session_id'):
             cookie_session = request.cookies.get('session_id')
             field_opponent = get_field_opponent(cookie_session)    
-            return jsonify(field_opponent=field_opponent)
+            if field_opponent:
+                return jsonify(field_opponent=field_opponent)
+            else:
+                return jsonify(field_opponent={})
 
 @app.route("/get_fields/", methods=['GET', 'POST'])            
 def get_fields():
