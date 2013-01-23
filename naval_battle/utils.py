@@ -681,13 +681,14 @@ def update_watch_users(id_game, session_id):
     """
     now = datetime.datetime.now()
     time_old = now + datetime.timedelta(minutes = -1 )
+    watch_user = None
     try:
         Watchusers.objects(time__lte=time_old).delete()
+        user = Users.objects.get(session=session_id)
+        game = Games.objects.get(id=id_game)
+        watch_user = Watchusers.objects(user=user, game=game)
     except:
-        pass
-    user = Users.objects.get(session=session_id)
-    game = Games.objects.get(id=id_game)
-    watch_user = Watchusers.objects(user=user, game=game)
+        return False
     if watch_user:
         watch_user[0].time = now
         watch_user[0].save()
