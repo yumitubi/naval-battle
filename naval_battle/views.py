@@ -54,6 +54,7 @@ def add_new_user():
         user = get_user_by_session(cookie_session)
         # if user exist
         if user:
+            print 'test'
             update_user(**{'session_id': cookie_session, 'time': True })
             # if already have a server
             if user.status == 0:
@@ -122,14 +123,15 @@ def update_data_main_page():
         current_user = "0"
         if request.cookies.has_key('session_id'):
             cookie_session = request.cookies.get('session_id')
-            update_user(**{ 'session_id': cookie_session, 'time': True })
-            user_status = get_user_status(cookie_session)
-            if user_status == 1:
-                return jsonify(user_status=user_status)
-            if user_status == 0:
-                user = get_user_by_session(cookie_session)
-                if user:
-                    current_user = user.user_name
+            if get_user_by_session(cookie_session):            # fix old time session
+                update_user(**{ 'session_id': cookie_session, 'time': True })
+                user_status = get_user_status(cookie_session)
+                if user_status == 1:
+                    return jsonify(user_status=user_status)
+                if user_status == 0:
+                    user = get_user_by_session(cookie_session)
+                    if user:
+                        current_user = user.user_name
         users = get_wait_users()
         list_username = {}
         for user in users:
