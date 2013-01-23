@@ -2,7 +2,7 @@
 
 import datetime
 from models import Fields, Users, Games, Logs, Watchusers
-from utils2 import get_around_cells
+from utils2 import get_around_cells, randstring
 from mongoengine.queryset import Q
 
 #------------------------------------------------------------
@@ -123,8 +123,10 @@ def get_user_by_session(session_id):
     Arguments:
     - `session_id`: session
     """
+    now = datetime.datetime.now()
+    time_old = now + datetime.timedelta(minutes = -30)
     try:
-        return Users.objects.get(session=session_id)
+        return Users.objects.get(session=session_id, last_time__gte=time_old)
     except:
         return False
 
@@ -537,6 +539,7 @@ def add_user_in_db(session_id, username, game, field, status=0, status_first=1):
         user.field_battle = field
         user.status = status
         user.status_first = status_first
+        user.last_time = datetime.datetime.now()
         user.save()
         game.time_begin = datetime.datetime.now()
         game.time_end = datetime.datetime.now()
