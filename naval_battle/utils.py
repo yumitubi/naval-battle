@@ -2,7 +2,7 @@
 
 import datetime
 from models import Fields, Users, Games, Logs, Watchusers
-from utils2 import get_around_cells, randstring
+from utils2 import get_around_cells
 from mongoengine.queryset import Q
 
 #------------------------------------------------------------

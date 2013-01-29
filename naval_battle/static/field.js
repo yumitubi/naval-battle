@@ -196,7 +196,9 @@ field.get = function (){
 		       });
 	    } else if(data['status'] == '8'){
 		// user not found in database
-		alert('Сначала создайте сервер на главное странице и дождитесь оппонента!');
+		window.location.href = "/";
+	    } else if(data['status'] == '0'){
+		// user wait opponent
 		window.location.href = "/";
 	    } else if(data['status'] == '1'){
 		// if user configure his field
