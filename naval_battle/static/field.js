@@ -12,11 +12,12 @@ var field = {
     numcell: 0,      // num cell on field
     po: 'you',
     user: 'wait',
-    shot_enabled: 1
+    shot_enabled: 1,
+    auto_fill: false     // if now autofill
 };
 
 ///////////////////////////////////////////////
-// the method draw table
+// the method draw table on page
 field.drawtable = function (nameblock){
     var 
     str_table = '<table class="field'+ nameblock +'"></table>',
@@ -177,12 +178,18 @@ field.update_field_two = function (){
 
 // the method get a data from server
 field.get = function (){
+    if(field.auto_fill == true){
+	return false;
+    }
     $.ajax({
 	url: '/send_state_field/',
 	type: 'post',
 	dataType: 'json',
 	data: ({}),
         success: function (data){
+	    if(field.auto_fill == true){
+		return false;
+	    }
 	    // alert(JSON.stringify(data));
 	    if(data['status'] == '7'){ // checking is the status 
 		// if user broken
@@ -656,3 +663,115 @@ function allCancel(){
     return false;
 }
 
+// auto-filling the field
+field.fillField = function (){
+    field.auto_fill = true; // blocking the function "field.get"
+    //clear field
+    for(var i=0; i<10; i++){
+	for(var m=0; m<10; m++){
+	    field.field[''+i+m] = "0";
+	    $('#'+i+m+field.po).attr('mark', '0');	
+	    $('#'+i+m+field.po).css('background-color', 'white');
+	}
+    }
+
+    var 
+    list_ships = [4, 3, 3, 2, 2, 2, 1, 1, 1, 1];
+
+
+    for(var ship=0; ship<list_ships.length; ship++){
+	// the variable 'duration':
+	// 1 - horizontal
+	// 2 - vertical
+	
+	var
+	x = Math.floor(Math.random() * (9 - 0 + 1)) + 0,
+	y = Math.floor(Math.random() * (9 - 0 + 1)) + 0,
+	duration = Math.floor(Math.random() * (2 - 1 + 1)) + 1,
+	list_cells = [],
+	decks = list_ships[ship],
+	free_cells = field.excludeCells();
+
+	while(decks > 0){
+	    if(''+x+y in free_cells){
+		list_cells.push(''+x+y);
+		decks--;
+		if(duration == 1){
+		    y++;		    
+		} else {
+		    x++;
+		}
+	    } else {
+		decks = list_ships[ship];
+		x = Math.floor(Math.random() * (9 - 0 + 1)) + 0;
+		y = Math.floor(Math.random() * (9 - 0 + 1)) + 0;
+		list_cells = [];
+	    }
+	}
+	for(var cell=0; cell<list_cells.length; cell++){
+	    field.field[list_cells[cell]] = "2";
+	    $('#'+list_cells[cell]+field.po).attr('mark', '2');	
+	    $('#'+list_cells[cell]+field.po).css('background-color', 'red');
+	}
+
+    }
+
+    // apply on DOM
+    field.update_field();
+    field.push();
+
+    for(var i=0; i<10; i++){
+	for(var m=0; m<10; m++){
+	    $('#'+i+m+field.po).text(field.field[''+i+m]);
+	}
+    }
+
+    field.auto_fill = false;
+    return false;
+};
+
+// exclude not valid cells
+field.excludeCells = function (){
+    var valid_cells = [];
+    
+    for(var x=0; x<10; x++){
+	for(var y=0; y<10; y++){
+	    var 
+	    arround_cells = [
+		'#' + ((+x)-1) + ((+y)-1) + field.po,
+		'#' + ((+x)-1) + y + field.po,
+		'#' + ((+x)-1) + ((+y)+1) + field.po,
+		'#' + x + ((+y)+1) + field.po,
+		'#' + ((+x)+1) + ((+y)+1) + field.po,
+		'#' + ((+x)+1) + y + field.po,
+		'#' + ((+x)+1) + ((+y)-1) + field.po,
+		'#' + x + ((+y)-1) + field.po
+	    ],
+	    cell_free = false,
+	    current_field = field.field;
+	    
+	    for(var cell=0; cell<arround_cells.length; cell++){
+		// if(current_field[arround_cells[cell]] == undefined || current_field[arround_cells[cell]] == "0"){
+		//     cell_free = true;
+		//     if(current_field[arround_cells[cell]]){
+		// 	$('#'+arround_cells[cell]+field.po).css('background-color', 'black');			
+		//     }
+		// } else {
+		//     cell_free = false;
+		//     break;
+		// }
+		if($(arround_cells[cell]).attr == "0" || $(arround_cells[cell]).attr == undefined){
+		    cell_free = true;
+		} else {
+		    cell_free = false;
+		}
+
+	    }
+	    if(cell_free == true){
+		valid_cells.push(''+x+y);
+	    }
+	}
+    }
+    
+    return valid_cells;
+};
