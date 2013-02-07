@@ -666,6 +666,7 @@ function allCancel(){
 // auto-filling the field
 field.fillField = function (){
 
+    // clear the field
     field.auto_fill = false;
     field.numcell = 0;
 
@@ -696,21 +697,19 @@ field.fillField = function (){
     }
 
     field.field = virtual_field;
-    
+
+    // each ship in list_ships calculate coordinates
     for(var ship=0; ship<list_ships.length; ship++){
-	deck = list_ships[ship];
+	deck = list_ships[ship]; // number of deck
 	x = Math.floor(Math.random() * (9 - 0 + 1)) + 0;
 	y = Math.floor(Math.random() * (9 - 0 + 1)) + 0;
-	// x = 5;
-	// y = 9;
-	direction = Math.floor(Math.random() * (2 - 1 + 1)) + 1;
-	// direction = 1;
-	list_cell = [];
-	gray_list_tmp = [];
+	direction = Math.floor(Math.random() * (2 - 1 + 1)) + 1; // the direction of the ship: down or right
+	list_cell = []; // red cells
+	gray_list_tmp = []; // this cells can be delete if the ship must not locate 
 	while(deck > 0){
 	    // check field
-	    buzy_list = [];
-	    gray_list = [];
+	    buzy_list = []; // the red cells on field
+	    gray_list = []; // the gray cells on field
 	    for(var a=0; a<10; a++){
 		for(var b=0; b<10; b++){
 		    if(virtual_field[''+a+b] == "2"){
@@ -727,7 +726,6 @@ field.fillField = function (){
 	    }
 
 	    //add new ship
- 	    // if( ''+x+y in buzy_list || ''+x+y in gray_list || !(''+x+y in virtual_field)){
 	    if( inList(''+x+y, buzy_list) || inList(''+x+y, gray_list) || !(''+x+y in virtual_field)){
 		for(var bad_cell=0; bad_cell<list_cell.length; bad_cell++){
 		    virtual_field[list_cell[bad_cell]] = "0";
@@ -735,7 +733,6 @@ field.fillField = function (){
 		}
 		for(var bad_gray=0; bad_gray<gray_list_tmp.length; bad_gray++){
 		    virtual_field[gray_list_tmp[bad_gray]] = "0";
-		    // $('#'+gray_list_tmp[bad_gray]+field.po).css('background-color', 'white');
 		}
 		list_cell = [];
 		gray_list_tmp = [];
@@ -777,15 +774,10 @@ field.fillField = function (){
 		   virtual_field[arround_cell[ar_cell]] != "1") {
 		    
 		    virtual_field[arround_cell[ar_cell]] = "1";
-		    // $('#'+arround_cell[ar_cell]+field.po).css('background-color', 'gray');
 		    gray_list_tmp.push(arround_cell[ar_cell]);
 		}
 	    }
 	}
-	// for(var cell_rez=0; cell_rez<list_cell.length; cell_rez++){
-	//     virtual_field[list_cell[cell_rez]] = "2"; 
-	//     $('#'+list_cell[cell_rez]+field.po).css('background-color', 'red');
-	// }
     }
     
     for(var i=0; i<10; i++){
@@ -795,9 +787,7 @@ field.fillField = function (){
 	    }
 	}
     }   
-    
     field.field = virtual_field;
-    // field.update_field();
 
     for(var i=0; i<10; i++){
         for(var m=0; m<10; m++){
@@ -812,6 +802,7 @@ field.fillField = function (){
     field.auto_fill = false;
 };
 
+// check whether the elements in the array
 function inList(element, list){
     for(i in list){
         if(element == list[i]){
