@@ -665,113 +665,158 @@ function allCancel(){
 
 // auto-filling the field
 field.fillField = function (){
-    field.auto_fill = true; // blocking the function "field.get"
-    //clear field
+
+    field.auto_fill = false;
+    field.numcell = 0;
+
+    for(var i=0; i<10; i++){
+        for(var m=0; m<10; m++){
+	    field.field[''+i+m] = "0";
+	    $('#'+i+m+field.po).attr('mark', '0');
+	    $('#'+i+m+field.po).css('background-color', 'white');	
+    	}
+    }
+
+    var
+    virtual_field = {},
+    x = 0,
+    y = 0,
+    direction = 1,
+    deck = 0,
+    buzy_list = [],
+    gray_list = [],
+    gray_list_tmp = [],
+    list_cell = [],
+    list_ships = [4, 3, 3, 2, 2, 2, 1, 1, 1, 1];
+
     for(var i=0; i<10; i++){
 	for(var m=0; m<10; m++){
-	    field.field[''+i+m] = "0";
-	    $('#'+i+m+field.po).attr('mark', '0');	
-	    $('#'+i+m+field.po).css('background-color', 'white');
+	    virtual_field[''+i+m] = "0";
 	}
     }
 
-    var 
-    list_ships = [4, 3, 3, 2, 2, 2, 1, 1, 1, 1];
-
-
+    field.field = virtual_field;
+    
     for(var ship=0; ship<list_ships.length; ship++){
-	// the variable 'duration':
-	// 1 - horizontal
-	// 2 - vertical
-	
-	var
-	x = Math.floor(Math.random() * (9 - 0 + 1)) + 0,
-	y = Math.floor(Math.random() * (9 - 0 + 1)) + 0,
-	duration = Math.floor(Math.random() * (2 - 1 + 1)) + 1,
-	list_cells = [],
-	decks = list_ships[ship],
-	free_cells = field.excludeCells();
+	deck = list_ships[ship];
+	x = Math.floor(Math.random() * (9 - 0 + 1)) + 0;
+	y = Math.floor(Math.random() * (9 - 0 + 1)) + 0;
+	// x = 5;
+	// y = 9;
+	direction = Math.floor(Math.random() * (2 - 1 + 1)) + 1;
+	// direction = 1;
+	list_cell = [];
+	gray_list_tmp = [];
+	while(deck > 0){
+	    // check field
+	    buzy_list = [];
+	    gray_list = [];
+	    for(var a=0; a<10; a++){
+		for(var b=0; b<10; b++){
+		    if(virtual_field[''+a+b] == "2"){
+			buzy_list.push('' + a + b);
+		    }
+		}
+	    }
+	    for(var a_gray=0; a_gray<10; a_gray++){
+		for(var b_gray=0; b_gray<10; b_gray++){
+		    if(virtual_field[''+a_gray+b_gray] == "1"){
+			gray_list.push('' + a_gray + b_gray);
+		    }
+		}
+	    }
 
-	while(decks > 0){
-	    if(''+x+y in free_cells){
-		list_cells.push(''+x+y);
-		decks--;
-		if(duration == 1){
-		    y++;		    
+	    //add new ship
+ 	    // if( ''+x+y in buzy_list || ''+x+y in gray_list || !(''+x+y in virtual_field)){
+	    if( inList(''+x+y, buzy_list) || inList(''+x+y, gray_list) || !(''+x+y in virtual_field)){
+		for(var bad_cell=0; bad_cell<list_cell.length; bad_cell++){
+		    virtual_field[list_cell[bad_cell]] = "0";
+		    $('#'+list_cell[bad_cell]+field.po).css('background-color', 'white');
+		}
+		for(var bad_gray=0; bad_gray<gray_list_tmp.length; bad_gray++){
+		    virtual_field[gray_list_tmp[bad_gray]] = "0";
+		    // $('#'+gray_list_tmp[bad_gray]+field.po).css('background-color', 'white');
+		}
+		list_cell = [];
+		gray_list_tmp = [];
+		deck = list_ships[ship];
+		x = Math.floor(Math.random() * (9 - 0 + 1)) + 0;
+		y = Math.floor(Math.random() * (9 - 0 + 1)) + 0;
+		direction = Math.floor(Math.random() * (2 - 1 + 1)) + 1;
+	    } else {
+		list_cell.push(''+x+y);
+		virtual_field[''+x+y] = "2"; 		
+		$('#'+x+y+field.po).css('background-color', 'red');
+		deck--;
+		if(direction == 1){
+		    y++;
 		} else {
 		    x++;
 		}
-	    } else {
-		decks = list_ships[ship];
-		x = Math.floor(Math.random() * (9 - 0 + 1)) + 0;
-		y = Math.floor(Math.random() * (9 - 0 + 1)) + 0;
-		list_cells = [];
 	    }
 	}
-	for(var cell=0; cell<list_cells.length; cell++){
-	    field.field[list_cells[cell]] = "2";
-	    $('#'+list_cells[cell]+field.po).attr('mark', '2');	
-	    $('#'+list_cells[cell]+field.po).css('background-color', 'red');
+
+	for(var cell=0; cell<list_cell.length; cell++){
+	    var
+	    coord = list_cell[cell],
+	    absc = coord[0],
+	    ordi = coord[1],
+	    arround_cell = [
+		''+((+absc)-1)+((+ordi)-1),
+		''+((+absc)-1)+ordi,
+		''+((+absc)-1)+((+ordi)+1),
+		''+absc+((+ordi)+1),
+		''+((+absc)+1)+((+ordi)+1),
+		''+((+absc)+1)+ordi,
+		''+((+absc)+1)+((+ordi)-1),
+		''+absc+((+ordi)-1)
+	    ];
+	    for(var ar_cell=0; ar_cell<arround_cell.length; ar_cell++){
+		if((arround_cell[ar_cell] in virtual_field) && 
+		    virtual_field[arround_cell[ar_cell]] != "2" && 
+		   virtual_field[arround_cell[ar_cell]] != "1") {
+		    
+		    virtual_field[arround_cell[ar_cell]] = "1";
+		    // $('#'+arround_cell[ar_cell]+field.po).css('background-color', 'gray');
+		    gray_list_tmp.push(arround_cell[ar_cell]);
+		}
+	    }
 	}
-
+	// for(var cell_rez=0; cell_rez<list_cell.length; cell_rez++){
+	//     virtual_field[list_cell[cell_rez]] = "2"; 
+	//     $('#'+list_cell[cell_rez]+field.po).css('background-color', 'red');
+	// }
     }
-
-    // apply on DOM
-    field.update_field();
-    field.push();
-
+    
     for(var i=0; i<10; i++){
 	for(var m=0; m<10; m++){
-	    $('#'+i+m+field.po).text(field.field[''+i+m]);
+	    if(virtual_field[''+i+m] == "1"){
+		virtual_field[''+i+m] = "0";
+	    }
 	}
-    }
+    }   
+    
+    field.field = virtual_field;
+    // field.update_field();
 
+    for(var i=0; i<10; i++){
+        for(var m=0; m<10; m++){
+	    if(field.field[''+i+m] == "2"){
+		$('#'+i+m+field.po).attr('mark', '2');	
+		field.numcell = field.numcell + 1;
+	    }
+    	}
+    }
+    field.push();
+    field.checkship();
     field.auto_fill = false;
-    return false;
 };
 
-// exclude not valid cells
-field.excludeCells = function (){
-    var valid_cells = [];
-    
-    for(var x=0; x<10; x++){
-	for(var y=0; y<10; y++){
-	    var 
-	    arround_cells = [
-		'#' + ((+x)-1) + ((+y)-1) + field.po,
-		'#' + ((+x)-1) + y + field.po,
-		'#' + ((+x)-1) + ((+y)+1) + field.po,
-		'#' + x + ((+y)+1) + field.po,
-		'#' + ((+x)+1) + ((+y)+1) + field.po,
-		'#' + ((+x)+1) + y + field.po,
-		'#' + ((+x)+1) + ((+y)-1) + field.po,
-		'#' + x + ((+y)-1) + field.po
-	    ],
-	    cell_free = false,
-	    current_field = field.field;
-	    
-	    for(var cell=0; cell<arround_cells.length; cell++){
-		// if(current_field[arround_cells[cell]] == undefined || current_field[arround_cells[cell]] == "0"){
-		//     cell_free = true;
-		//     if(current_field[arround_cells[cell]]){
-		// 	$('#'+arround_cells[cell]+field.po).css('background-color', 'black');			
-		//     }
-		// } else {
-		//     cell_free = false;
-		//     break;
-		// }
-		if($(arround_cells[cell]).attr == "0" || $(arround_cells[cell]).attr == undefined){
-		    cell_free = true;
-		} else {
-		    cell_free = false;
-		}
-
-	    }
-	    if(cell_free == true){
-		valid_cells.push(''+x+y);
-	    }
-	}
+function inList(element, list){
+    for(i in list){
+        if(element == list[i]){
+            return true;
+        }
     }
-    
-    return valid_cells;
-};
+    return false;
+}
