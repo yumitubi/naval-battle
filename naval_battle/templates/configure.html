@@ -19,8 +19,8 @@
      <br />
      <div class="battons">
        <form method="POST" id="battons" action="">
-	 <input class="btn-primary btn-large" id="ready" type="button" name="i_win" value="Готов к сражению!" onclick="allReady()"/>
-	 <input class="btn-primary btn-large" id="all_cancel" type="button" name="i_lose" value="Я передумал" onclick="allCancel()" /><br /><br />
+	 <input class="btn-primary btn-large" id="ready" type="button" name="i_win" value="Готов(а) к сражению!" onclick="allReady()"/>
+	 <input class="btn-primary btn-large" id="all_cancel" type="button" name="i_lose" value="Я передумал(а)" onclick="allCancel()" /><br /><br />
 	 <input class="btn-primary btn-large" id="ready" type="button" name="auto_fill" value="Авто-расстановка" onclick="field.fillField()"/>
        </form>
      </div>
@@ -34,4 +34,42 @@
    </div>
  </div>
 </div>
+<div class="span5">
+  <div class="row">
+    <div class="tips">
+      <br />
+      <br />
+      <div class="alert alert-success">
+	<h3>Подсказки</h3>
+	<ol>
+	  <li>Что бы расставить корабли, щелкайте по клеткам</li>
+	  <li>Начинайте расстановку кораблей с самого большого и заканчивайте самым маленьким</li>
+	  <li>Кнопка "Авторасстановка" расставить корабли за Вас</li>
+	  <li>Общее количество занятых кораблями клеток должно быть равно 20</li>
+	</ol>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="span1">
+  
+</div>
+<div class="span5">
+  <div class="row">
+    <div class="tips">
+      <br />
+      <br />
+      <div class="alert alert-success">
+	<h3>К сведенью</h3>
+	<ol>
+	  <li>Нажимая на кнопку "Я передумал(а), Вы отказываетесь от игры"</li>
+	  <li>Список уже сыгранных игр доступен на странице <a href="/archive/">Архив</a></li>
+	  <li>За ходом игры могут наблюдать другие посетители сайта, но они могут видеть только уже потопленные корабли у двух играющих</li>
+	  <li>Исходный код проект доступен на <a href="https://github.com/le087/naval-battle">GitHub</a></li>
+	</ol>
+      </div>
+    </div>
+  </div>
+</div>
+
 {% endblock %}
