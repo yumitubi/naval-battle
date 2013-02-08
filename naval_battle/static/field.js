@@ -190,7 +190,9 @@ field.get = function (){
 	    if(field.auto_fill == true){
 		return false;
 	    }
-	    // alert(JSON.stringify(data));
+	    if(window.location.href == 'http://'+window.location.host+'/configure/' && data['status'] != "1"){
+		window.location.href = "/battle/";
+	    }
 	    if(data['status'] == '7'){ // checking is the status 
 		// if user broken
 		$.ajax({
@@ -263,12 +265,10 @@ field.get = function (){
 		audio.play();
 		alert("Вы проиграли =(");
 		window.location.href = "/move_game/";
-	    }//  else {
-	    // 	alert('Игра прервана');
-	    // 	window.location.href = "/";
-	    // }
+	    }
 	}
-    });
+	   });
+    
     return false;
 };
 
