@@ -799,6 +799,7 @@ field.fillField = function (){
     }
     field.push();
     field.checkship();
+    field.checkmaximum();
     field.auto_fill = false;
 };
 
