@@ -45,16 +45,21 @@ def get_begin_games():
     { 'id_game':['user1', 'user2'],
       'id_game':['user1', 'user2']}
     """
+    now = datetime.datetime.now()
+    time_old = now + datetime.timedelta(minutes = -60)
     games_begin = Games.objects(Q(status=1) | Q(status=3))
     users = Users.objects(game__in=games_begin)
     games = {}
     for user in users:
-        game = user.game
-        id_game = str(game.id)
-        if games.has_key(id_game):
-            games[id_game].append(user.user_name)
+        if user.last_time < time_old:
+            pass
         else:
-            games[id_game] = [user.user_name]
+            game = user.game
+            id_game = str(game.id)
+            if games.has_key(id_game):
+                games[id_game].append(user.user_name)
+            else:
+                games[id_game] = [user.user_name]
     return games
 
 
