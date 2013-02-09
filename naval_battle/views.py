@@ -80,6 +80,7 @@ def add_new_user():
                                user_status=0, 
                                new_user=1)
 
+
 @app.route("/add_second_user/", methods=['GET', 'POST'])
 def add_second_user():
     """registration second user for play
@@ -358,7 +359,9 @@ def get_archive_game():
     """response list of archive games
     """
     if request.method == 'POST':
-        list_games = get_list_archive_game(request.form['firstdate'], request.form['seconddate'])
+        list_games = get_list_archive_game(request.form['firstdate'], 
+                                           request.form['seconddate'],
+                                           request.form['searchname'])
         if list_games:
             return jsonify(games=list_games,
                            result="1")

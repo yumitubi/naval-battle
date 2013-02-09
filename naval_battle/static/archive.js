@@ -13,7 +13,8 @@ function getlistgames(){
 	       type: 'post',
 	       dataType: 'json',
 	       data: ({'firstdate': $("#datepicker1").val(),
-		       'seconddate': $("#datepicker2").val()}),
+		       'seconddate': $("#datepicker2").val(),
+		       'searchname': $("#searchname").val()}),
 	       success: function(data){
 		   if( data['result'] == "1"){
 		       $('#list_games').text('');
@@ -22,7 +23,7 @@ function getlistgames(){
 				   $('#' + key).click(goMoveBattle);
 			       });
 		   } else {
-		       alert('Неправильная дата!');
+		       alert('Игр не обнаружено!');
 		   }
 	       }
 	   });   

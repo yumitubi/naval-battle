@@ -341,7 +341,7 @@ def get_time_begin(id_game):
     minutes, seconds = divmod(diff.total_seconds(), 60)
     return str(minutes) + ' минут ' + str(seconds) + ' секунд'
 
-def get_list_archive_game(firstdate, seconddate):
+def get_list_archive_game(firstdate, seconddate, searchname):
     """ returh list archive games
 
     - return dictionary in format:
@@ -395,8 +395,13 @@ def get_list_archive_game(firstdate, seconddate):
         dict_game = {}
         for game in games:
             note = Logs.objects(game=game)[0]
-            dict_game[str(note.game.id)] = { 'date' : note.game.time_begin.strftime('%d-%m-%Y'),
-                                             'players': note.move_user + ' VS ' + note.opponent }
+            if searchname:
+                if (searchname.lower() in note.move_user.lower()) or (searchname.lower() in note.opponent.lower()):
+                    dict_game[str(note.game.id)] = { 'date' : note.game.time_begin.strftime('%d-%m-%Y'),
+                                                     'players': note.move_user + ' VS ' + note.opponent }
+            else:
+                dict_game[str(note.game.id)] = { 'date' : note.game.time_begin.strftime('%d-%m-%Y'),
+                                                 'players': note.move_user + ' VS ' + note.opponent }
         return dict_game
     return True
 
