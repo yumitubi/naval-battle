@@ -52,6 +52,7 @@ class Users(db.Document):
                 `5` - user final game - win
                 `6` - user final game - lose
                 `7` - user ran
+                `8` - bad user
     """
     user_name = db.StringField(max_length=255, required=True)
     session = db.StringField(max_length=255, required=True)
@@ -81,7 +82,6 @@ class Logs(db.Document):
     meta = {
         'ordering': ['-time']
     }
-        
 
 class Watchusers(db.Document):
     """model contain users which watch games"""
