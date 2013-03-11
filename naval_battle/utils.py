@@ -626,6 +626,7 @@ def update_field(session_id, field_dict):
         return False
 
 # TODO: check unuse and delet this function
+# mark: deprekated
 def update_status_user(user_id, status):
     """ make update the status of user
     

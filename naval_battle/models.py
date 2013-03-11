@@ -53,6 +53,8 @@ class Users(db.Document):
                 `6` - user final game - lose
                 `7` - user ran
                 `8` - bad user
+    - field `status_first`: for correct show on page Move Game
+    - field `last_time`: time of last live-signal from user
     """
     user_name = db.StringField(max_length=255, required=True)
     session = db.StringField(max_length=255, required=True)
